@@ -84,6 +84,20 @@ Route::middleware(['structure'])->prefix('structure')->name('structure.')->group
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('admin.logout');
 
+// Routes d'authentification Caserne (Connexion et Configuration)
+Route::prefix('caserne')->name('caserne.auth.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Caserne\AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/', [\App\Http\Controllers\Caserne\AuthController::class, 'login'])->name('login-submit');
+    Route::get('/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'showSetupForm'])->name('setup-form');
+    Route::post('/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'setupPassword'])->name('setup-submit');
+    Route::get('/groupe/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'showGroupeSetupForm'])->name('groupe.setup-form');
+    Route::post('/groupe/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'setupGroupePassword'])->name('groupe.setup-submit');
+
+    // Mot de passe oublié via OTP
+    Route::get('/forgot-password', [\App\Http\Controllers\Caserne\AuthController::class, 'showForgotPasswordForm'])->name('forgot');
+    Route::post('/forgot-password', [\App\Http\Controllers\Caserne\AuthController::class, 'sendResetLinkEmail'])->name('forgot.post');
+});
+
 // Routes protégées pour la Caserne
 Route::middleware(['auth', 'caserne'])->prefix('caserne')->name('caserne.')->group(function () {
     Route::get('/groupe/dashboard', [\App\Http\Controllers\Caserne\GroupeController::class, 'dashboard'])->name('groupe.dashboard');
@@ -114,15 +128,6 @@ Route::middleware(['auth', 'caserne'])->prefix('caserne')->name('caserne.')->gro
     // Route::post('/logout', [CaserneController::class, 'logout'])->name('caserne.logout');
 });
 
-// Routes d'authentification Caserne (Connexion et Configuration)
-Route::prefix('caserne')->name('caserne.auth.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Caserne\AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/', [\App\Http\Controllers\Caserne\AuthController::class, 'login'])->name('login-submit');
-    Route::get('/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'showSetupForm'])->name('setup-form');
-    Route::post('/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'setupPassword'])->name('setup-submit');
-    Route::get('/groupe/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'showGroupeSetupForm'])->name('groupe.setup-form');
-    Route::post('/groupe/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'setupGroupePassword'])->name('groupe.setup-submit');
-});
 
 // Route temporaire pour mettre à jour les lieux des sinistres existants via conversion GPS
 Route::get('/dev/backfill-lieux', function() {

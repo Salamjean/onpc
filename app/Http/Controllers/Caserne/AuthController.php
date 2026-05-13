@@ -123,4 +123,31 @@ class AuthController extends Controller
 
         return redirect()->route('caserne.auth.login')->with('success', 'Mot de passe du groupe configuré avec succès. Vous pouvez maintenant vous connecter.');
     }
+    /**
+     * Affiche le formulaire de demande de réinitialisation
+     */
+    public function showForgotPasswordForm()
+    {
+        return view('caserne.auth.forgot-password');
+    }
+
+    /**
+     * Envoie le code OTP de réinitialisation
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        // Génération d'un code OTP à 6 chiffres
+        $otp = rand(100000, 999999);
+        $user->update(['otp_code' => $otp]);
+
+        // Envoi de l'email
+        \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpCaserneMail($otp));
+
+        return redirect()->route('caserne.auth.setup-form', ['email' => $request->email])
+            ->with('success', 'Un code de vérification a été envoyé à votre adresse email.');
+    }
 }

@@ -59,9 +59,16 @@
                                 </span>
                             </td>
                             <td class="px-6 py-5 text-center">
-                                <div class="flex flex-col items-center">
-                                    <span
-                                        class="text-xs font-bold text-slate-600 italic">{{ $sinistre->lieu ?? ($sinistre->latitude . ', ' . $sinistre->longitude) }}</span>
+                                <div class="flex items-center justify-center gap-2">
+                                    <span class="text-xs font-bold text-slate-600 italic">
+                                        {{ $sinistre->lieu ?? ($sinistre->latitude . ', ' . $sinistre->longitude) }}
+                                    </span>
+                                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ $sinistre->latitude }},{{ $sinistre->longitude }}" 
+                                       target="_blank" 
+                                       class="p-1.5 bg-blue-50 text-onpc-blue rounded-lg hover:bg-onpc-blue hover:text-white transition-all shadow-sm"
+                                       title="Voir l'itinéraire">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 013 15.488V5.111a2 2 0 012.553-1.91l6.447 2.149 6.447-2.149A2 2 0 0121 5.111v10.377a2 2 0 01-1.553 1.91L14 20l-5 2z"/></svg>
+                                    </a>
                                 </div>
                             </td>
                             <td class="px-6 py-5 text-center">

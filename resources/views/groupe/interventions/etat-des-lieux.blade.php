@@ -17,7 +17,7 @@
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
         <div class="xl:col-span-8 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8">
-            <form action="{{ route('caserne.groupe.interventions.etat-des-lieux.store', $sinistre) }}" method="POST"
+            <form id="etat-des-lieux-form" action="{{ route('caserne.groupe.interventions.etat-des-lieux.store', $sinistre) }}" method="POST"
                 enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
@@ -142,6 +142,42 @@
                     <p class="mt-1 font-semibold text-slate-700">{{ $sinistre->created_at->format('d/m/Y H:i') }}</p>
                 </div>
             </div>
+
+            {{-- Doublons / Regroupement --}}
+            @if($autresSinistres->count() > 0)
+            <div class="mt-8 pt-8 border-t border-slate-100">
+                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Déclarations Groupées (Doublons)</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    @foreach($autresSinistres as $autre)
+                    <label class="block p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-onpc-orange transition-all cursor-pointer group">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1">
+                                <input type="checkbox" name="merged_sinistres[]" value="{{ $autre->id }}" 
+                                    form="etat-des-lieux-form"
+                                    class="w-5 h-5 rounded-lg border-slate-300 text-onpc-orange focus:ring-onpc-orange">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start gap-2">
+                                    <span class="text-[10px] font-black text-onpc-blue uppercase truncate">{{ $autre->reference ?? '#SN-'.$autre->id }}</span>
+                                    <span class="text-[9px] font-bold text-slate-400 shrink-0">{{ $autre->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-xs font-black text-slate-800 mt-1 truncate">{{ $autre->type_sinistre }}</p>
+                                <p class="text-[10px] font-medium text-slate-500 mt-1 line-clamp-1 italic">"{{ $autre->description }}"</p>
+                                <div class="flex items-center gap-1 mt-2">
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                                    <span class="text-[9px] font-bold text-slate-400 truncate">{{ $autre->lieu ?? 'Localisation GPS' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                    @endforeach
+                </div>
+                <p class="mt-4 p-3 bg-blue-50 rounded-xl text-[10px] font-bold text-blue-700 leading-relaxed border border-blue-100">
+                    <svg class="w-4 h-4 inline mr-1 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Cochez les déclarations qui concernent le même incident. Elles seront marquées comme terminées automatiquement.
+                </p>
+            </div>
+            @endif
         </div>
     </div>
 

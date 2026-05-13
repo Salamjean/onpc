@@ -109,7 +109,7 @@
                 <div class="space-y-2">
                     <div class="flex justify-between items-center px-1">
                         <label for="password" class="text-sm font-bold text-slate-700">Mot de passe</label>
-                        <a href="#" class="text-xs font-bold text-caserne-red hover:underline">Oublié ?</a>
+                        <a href="{{ route('caserne.auth.forgot') }}" class="text-xs font-bold text-caserne-red hover:underline">Oublié ?</a>
                     </div>
                     <div class="relative group">
                         <div

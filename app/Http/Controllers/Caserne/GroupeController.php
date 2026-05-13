@@ -356,7 +356,19 @@ class GroupeController extends Controller
             abort(403, 'Vous n\'etes pas autorise a faire l\'etat des lieux de cet incident.');
         }
 
-        return view('groupe.interventions.etat-des-lieux', compact('sinistre', 'groupe', 'caserne'));
+        // Récupérer les autres sinistres actifs (en attente ou en cours)
+        // liés à la caserne parente pour permettre le regroupement (doublons)
+        $autresSinistres = Sinistre::where('id', '!=', $sinistre->id)
+            ->whereIn('status', ['en_attente', 'en_cours'])
+            ->where(function($query) use ($caserne) {
+                $query->whereHas('casernes', function($q) use ($caserne) {
+                    $q->where('users.id', $caserne->id);
+                })->orWhere('assigned_caserne_id', $caserne->id);
+            })
+            ->latest()
+            ->get();
+
+        return view('groupe.interventions.etat-des-lieux', compact('sinistre', 'groupe', 'caserne', 'autresSinistres'));
     }
 
     public function etatDesLieuxStore(Request $request, Sinistre $sinistre)
@@ -374,6 +386,8 @@ class GroupeController extends Controller
             'nb_evacues' => 'nullable|integer|min:0',
             'etat_des_lieux_documents' => 'nullable|array',
             'etat_des_lieux_documents.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'merged_sinistres' => 'nullable|array',
+            'merged_sinistres.*' => 'exists:sinistres,id',
         ]);
 
         $existingDocuments = is_array($sinistre->etat_des_lieux_documents)
@@ -401,7 +415,16 @@ class GroupeController extends Controller
             'date_cloture' => now(),
         ]);
 
+        // Marquer les sinistres fusionnés (doublons) comme terminés
+        if (!empty($data['merged_sinistres'])) {
+            Sinistre::whereIn('id', $data['merged_sinistres'])->update([
+                'status' => 'termine',
+                'date_cloture' => now(),
+                'rapport_intervention' => "[DOUBLON] Cet incident a été traité lors de l'intervention #" . ($sinistre->reference ?? $sinistre->id),
+            ]);
+        }
+
         return redirect()->route('caserne.groupe.interventions.index')
-            ->with('success', 'Etat des lieux enregistre avec succes.');
+            ->with('success', 'Etat des lieux enregistré avec succès. ' . (isset($data['merged_sinistres']) ? count($data['merged_sinistres']) . ' doublons clôturés.' : ''));
     }
 }
