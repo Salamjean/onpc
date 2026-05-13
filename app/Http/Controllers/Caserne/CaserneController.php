@@ -14,35 +14,59 @@ class CaserneController extends Controller
     {
         $caserne = Auth::user();
 
-        // 1. Sinistres assignés directement à cette caserne (depuis structure) et encore en_attente
-        $sinistresAssignes = Sinistre::where('assigned_caserne_id', $caserne->id)
-            ->where('status', 'en_attente')
+        $sinistresScopes = Sinistre::whereHas('casernes', function ($query) use ($caserne) {
+            $query->where('users.id', $caserne->id);
+        });
+
+        $sinistresEnAttente = (clone $sinistresScopes)->where('status', 'en_attente')->count();
+        $sinistresEnCours = (clone $sinistresScopes)->where('status', 'en_cours')->count();
+        $sinistresTermines = (clone $sinistresScopes)->where('status', 'termine')->count();
+        $sinistresZone = (clone $sinistresScopes)->whereNull('assigned_caserne_id')->count();
+
+        $statsParStatut = [
+            'En attente' => $sinistresEnAttente,
+            'En cours' => $sinistresEnCours,
+            'Terminé' => $sinistresTermines,
+        ];
+
+        $statsParType = (clone $sinistresScopes)->selectRaw('type_sinistre, count(*) as total')
+            ->groupBy('type_sinistre')
+            ->orderByDesc('total')
+            ->pluck('total', 'type_sinistre');
+
+        $dernieresDeclarations = (clone $sinistresScopes)
             ->latest()
+            ->limit(2)
             ->get();
 
-        // 2. Sinistres dans la zone de la caserne (via pivot) non encore assignés
-        $sinistresZone = $caserne->sinistresAssignes()
-            ->whereNull('assigned_caserne_id')
+        return view('caserne.dashboard', compact(
+            'sinistresEnAttente',
+            'sinistresEnCours',
+            'sinistresTermines',
+            'sinistresZone',
+            'statsParStatut',
+            'statsParType',
+            'dernieresDeclarations'
+        ));
+    }
+
+    public function sinistres()
+    {
+        $caserne = Auth::user();
+        $groupIds = $caserne->groupes()->pluck('id')->push($caserne->id);
+
+        $sinistres = Sinistre::with('caserneAssignee')
+            ->where('status', '!=', 'termine')
+            ->where(function ($query) use ($caserne, $groupIds) {
+                $query->whereHas('casernes', function ($q) use ($caserne) {
+                    $q->where('users.id', $caserne->id);
+                })
+                ->orWhereIn('assigned_caserne_id', $groupIds);
+            })
             ->latest()
-            ->get();
+            ->paginate(12);
 
-        // 3. Interventions en cours (status = 'en_cours')
-        $interventions = Sinistre::where('assigned_caserne_id', $caserne->id)
-            ->where('status', 'en_cours')
-            ->latest()
-            ->get();
-
-        // Fusionner les trois collections sans doublons
-        $sinistres = $sinistresAssignes->merge($sinistresZone)->merge($interventions)->unique('id')->values();
-
-        // Compter les interventions en cours
-        $interventionsCount = $interventions->count();
-
-        if (request()->ajax()) {
-            return view('caserne.partials.sinistres_table', compact('sinistres', 'interventionsCount'));
-        }
-
-        return view('caserne.dashboard', compact('sinistres', 'interventionsCount'));
+        return view('caserne.sinistres.index', compact('sinistres', 'caserne'));
     }
 
     public function rapports()
@@ -61,8 +85,10 @@ class CaserneController extends Controller
     public function historique()
     {
         $caserne = Auth::user();
+        $ids = $caserne->groupes()->pluck('id')->push($caserne->id);
 
-        $sinistres = Sinistre::where('assigned_caserne_id', $caserne->id)
+        $sinistres = Sinistre::with('caserneAssignee')
+            ->whereIn('assigned_caserne_id', $ids)
             ->where('status', 'termine')
             ->latest('date_cloture')
             ->paginate(12);
@@ -105,7 +131,25 @@ class CaserneController extends Controller
 
     public function show(Sinistre $sinistre)
     {
-        $caserne = Auth::user();
+        $user = Auth::user();
+
+        // Si c'est un groupe, vérifier les permissions du groupe
+        if ($user->role === 'groupe') {
+            $caserne = $user->caserneParent;
+
+            // Le groupe est autorisé s'il est assigné au sinistre OR si le sinistre appartient à sa caserne parent
+            $isAuthorized = $sinistre->assigned_caserne_id === $user->id ||
+                ($caserne && $sinistre->casernes()->where('user_id', $caserne->id)->exists());
+
+            if (!$isAuthorized) {
+                abort(403, 'Vous n\'êtes pas autorisé à consulter cet incident.');
+            }
+
+            return view('caserne.sinistre.show', compact('sinistre', 'caserne'));
+        }
+
+        // Si c'est une caserne
+        $caserne = $user;
 
         // Vérifier si la caserne est autorisée à voir ce sinistre
         // (Elle doit être la caserne la plus proche OR la caserne assignée)
@@ -121,25 +165,6 @@ class CaserneController extends Controller
 
     public function claim(Sinistre $sinistre)
     {
-        $caserne = Auth::user();
-
-        // Vérifier si le sinistre est déjà pris par quelqu'un d'autre
-        if ($sinistre->assigned_caserne_id && $sinistre->assigned_caserne_id !== $caserne->id) {
-            return back()->with('error', 'Ce sinistre a déjà été récupéré par une autre caserne.');
-        }
-
-        // Assigner à la caserne actuelle
-        $sinistre->update([
-            'assigned_caserne_id' => $caserne->id,
-            'status' => 'en_cours'
-        ]);
-
-        // Envoi immédiat du SMS de notification au déclarant
-        $ref = $sinistre->reference ?? "#SN-{$sinistre->id}";
-        $message = "Urgence ONPC - {$ref}: La caserne {$caserne->name} est actuellement en route. Merci de nous avoir alertés.";
-
-        SmsService::send($sinistre->contact, $message);
-
-        return back()->with('success', 'Intervention démarrée ! Les secours sont en route.');
+        abort(403, 'La prise en charge des sinistres est desactivee pour la caserne.');
     }
 }

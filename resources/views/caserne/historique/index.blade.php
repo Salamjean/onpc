@@ -24,6 +24,7 @@
                         <th class="px-6 py-4 text-center">Reference / Date</th>
                         <th class="px-6 py-4 text-center">Declarant</th>
                         <th class="px-6 py-4 text-center">Type</th>
+                        <th class="px-6 py-4 text-center">Groupe / Unité</th>
                         <th class="px-6 py-4 text-center">Statut</th>
                         <th class="px-6 py-4 text-center">Actions</th>
                     </tr>
@@ -35,6 +36,9 @@
                             <td class="px-6 py-5 first:rounded-l-4xl text-center">
                                 <div class="font-black text-slate-900 text-sm">
                                     {{ $sinistre->reference ?? '#SN-' . $sinistre->id }}
+                                </div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-wider">
+                                    {{ $sinistre->lieu ?? ($sinistre->latitude . ', ' . $sinistre->longitude) }}
                                 </div>
                                 <div class="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-wider">
                                     {{ optional($sinistre->date_cloture)->format('d/m/Y H:i') ?? '-' }}</div>
@@ -51,6 +55,11 @@
                                 @else bg-blue-100 text-blue-600 @endif">
                                     {{ $sinistre->type_sinistre }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                <div class="font-black text-caserne-dark text-xs uppercase">
+                                    {{ $sinistre->caserneAssignee->name ?? 'Non assigne' }}
+                                </div>
                             </td>
                             <td class="px-6 py-5 text-center">
                                 <span

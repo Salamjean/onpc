@@ -60,7 +60,7 @@
                     <td class="px-4 md:px-6 py-5">
                         <div class="flex flex-col">
                             <span class="font-bold text-slate-800 text-sm">{{ $sinistre->type_sinistre }}</span>
-                            <span class="text-[10px] text-slate-400 font-medium italic">{{ $sinistre->lieu }}</span>
+                            <span class="text-[10px] text-slate-400 font-medium italic">{{ $sinistre->lieu ?? ($sinistre->latitude . ', ' . $sinistre->longitude) }}</span>
                         </div>
                     </td>
                     <td class="hidden md:table-cell px-6 py-5 text-sm font-medium text-slate-500">

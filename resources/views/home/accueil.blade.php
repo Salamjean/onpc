@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ONPC — Portail Citoyen | Déclaration de Sinistre</title>
     <meta name="description" content="Déclarez un sinistre en temps réel. L'ONPC coordonne les secours les plus proches.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="shortcut icon" href="{{ asset('assets/images/logo_onpc.png') }}" type="image/x-icon">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -49,7 +52,9 @@
             overflow-x: hidden;
         }
 
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
 
         /* --- Global Utility --- */
         .container {
@@ -59,28 +64,69 @@
         }
 
         @media (max-width: 1024px) {
-            .container { padding: 0 5%; }
+            .container {
+                padding: 0 5%;
+            }
         }
 
         @media (max-width: 640px) {
-            .container { padding: 0 1.5rem; }
+            .container {
+                padding: 0 1.5rem;
+            }
         }
 
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .justify-center { justify-content: center; }
-        .flex-col { flex-direction: column; }
-        .gap-2 { gap: 0.5rem; }
-        .gap-3 { gap: 0.75rem; }
-        .gap-4 { gap: 1rem; }
-        .gap-6 { gap: 1.5rem; }
-        .grid { display: grid; }
-        .hidden { display: none; }
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .hidden {
+            display: none;
+        }
 
         @media (min-width: 768px) {
-            .md-flex { display: flex; }
-            .md-grid { display: grid; }
+            .md-flex {
+                display: flex;
+            }
+
+            .md-grid {
+                display: grid;
+            }
         }
 
         /* --- Navbar --- */
@@ -113,11 +159,21 @@
         }
 
         @media (min-width: 768px) {
-            .nav-logo-box { gap: 0.75rem; padding: 0.625rem 1rem; }
+            .nav-logo-box {
+                gap: 0.75rem;
+                padding: 0.625rem 1rem;
+            }
         }
 
-        .nav-logo-img { height: 1.5rem; }
-        @media (min-width: 768px) { .nav-logo-img { height: 2rem; } }
+        .nav-logo-img {
+            height: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .nav-logo-img {
+                height: 2rem;
+            }
+        }
 
         .nav-logo-text {
             border-left: 1px solid rgba(255, 255, 255, 0.3);
@@ -125,7 +181,9 @@
         }
 
         @media (max-width: 480px) {
-            .nav-logo-tagline { display: none; }
+            .nav-logo-tagline {
+                display: none;
+            }
         }
 
         .nav-logo-tagline {
@@ -161,7 +219,9 @@
             padding: 0.5rem 1rem;
         }
 
-        .nav-link:hover { color: var(--white); }
+        .nav-link:hover {
+            color: var(--white);
+        }
 
         .nav-btn {
             background-color: var(--orange-onpc);
@@ -181,7 +241,12 @@
         }
 
         @media (min-width: 768px) {
-            .nav-btn { padding: 0.625rem 1.25rem; font-size: 0.625rem; gap: 0.5rem; letter-spacing: 0.1em; }
+            .nav-btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.625rem;
+                gap: 0.5rem;
+                letter-spacing: 0.1em;
+            }
         }
 
         .nav-btn:hover {
@@ -197,19 +262,22 @@
             align-items: center;
             position: relative;
             overflow: hidden;
-            padding-top: 8rem; /* Augmenté pour mobile */
+            padding-top: 8rem;
+            /* Augmenté pour mobile */
         }
 
         @media (min-width: 1024px) {
-            .hero { padding-top: 5rem; }
+            .hero {
+                padding-top: 5rem;
+            }
         }
 
         .hero::before {
             content: '';
             position: absolute;
             inset: 0;
-            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
         }
 
@@ -240,7 +308,8 @@
         .hero-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 2.5rem; /* Réduit pour mobile */
+            gap: 2.5rem;
+            /* Réduit pour mobile */
             align-items: center;
             position: relative;
             z-index: 10;
@@ -248,14 +317,30 @@
         }
 
         @media (max-width: 1024px) {
-            .hero-text { text-align: center; }
-            .hero-title-badge { justify-content: center; }
-            .hero-stats { justify-content: center; }
-            .hero-desc { margin-left: auto; margin-right: auto; }
+            .hero-text {
+                text-align: center;
+            }
+
+            .hero-title-badge {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-desc {
+                margin-left: auto;
+                margin-right: auto;
+            }
         }
 
         @media (min-width: 1024px) {
-            .hero-grid { grid-template-columns: 1fr 1fr; gap: 6rem; padding-bottom: 0; }
+            .hero-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6rem;
+                padding-bottom: 0;
+            }
         }
 
         .hero-title-badge {
@@ -300,7 +385,9 @@
             opacity: 0;
         }
 
-        .text-orange { color: var(--orange-onpc); }
+        .text-orange {
+            color: var(--orange-onpc);
+        }
 
         .hero-desc {
             font-size: 1.125rem;
@@ -362,7 +449,9 @@
         }
 
         @media (min-width: 768px) {
-            .form-header { padding: 2rem 3rem; }
+            .form-header {
+                padding: 2rem 3rem;
+            }
         }
 
         .form-header-tag {
@@ -382,7 +471,11 @@
             margin-top: 0.25rem;
         }
 
-        .form-steps { display: flex; align-items: center; gap: 0.75rem; }
+        .form-steps {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
         .step-num {
             width: 3rem;
@@ -396,20 +489,34 @@
             transition: all 0.3s;
         }
 
-        .step-active { background: var(--orange-onpc); color: var(--white); }
-        .step-inactive { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.4); }
+        .step-active {
+            background: var(--orange-onpc);
+            color: var(--white);
+        }
+
+        .step-inactive {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+        }
 
         .step-divider {
             width: 1.5rem;
             height: 1px;
             background: rgba(255, 255, 255, 0.2);
         }
-        .step-divider-active { background: var(--orange-onpc); }
 
-        .form-body { padding: 1.5rem; }
+        .step-divider-active {
+            background: var(--orange-onpc);
+        }
+
+        .form-body {
+            padding: 1.5rem;
+        }
 
         @media (min-width: 768px) {
-            .form-body { padding: 3rem; }
+            .form-body {
+                padding: 3rem;
+            }
         }
 
         .form-grid {
@@ -419,10 +526,16 @@
         }
 
         @media (min-width: 640px) {
-            .form-grid-2 { grid-template-columns: 1fr 1fr; }
+            .form-grid-2 {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
-        .field-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
         .field-label {
             font-size: 0.75rem;
@@ -446,7 +559,10 @@
             font-size: 1rem;
         }
 
-        .input::placeholder { font-weight: 400; color: var(--slate-300); }
+        .input::placeholder {
+            font-weight: 400;
+            color: var(--slate-300);
+        }
 
         .input:focus {
             background: var(--white);
@@ -462,7 +578,9 @@
         }
 
         @media (min-width: 640px) {
-            .type-grid { grid-template-columns: repeat(3, 1fr); }
+            .type-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .type-option {
@@ -470,7 +588,9 @@
             cursor: pointer;
         }
 
-        .type-radio { display: none; }
+        .type-radio {
+            display: none;
+        }
 
         .type-box {
             display: flex;
@@ -486,10 +606,15 @@
         }
 
         @media (min-width: 768px) {
-            .type-box { padding: 1.5rem; gap: 0.5rem; }
+            .type-box {
+                padding: 1.5rem;
+                gap: 0.5rem;
+            }
         }
 
-        .type-icon { font-size: 2rem; }
+        .type-icon {
+            font-size: 2rem;
+        }
 
         .type-label {
             font-size: 0.625rem;
@@ -499,7 +624,7 @@
             color: var(--slate-500);
         }
 
-        .type-radio:checked + .type-box {
+        .type-radio:checked+.type-box {
             border-color: var(--orange-onpc);
             background: #fff7ed;
         }
@@ -591,9 +716,20 @@
             transition: all 0.3s;
         }
 
-        .status-success { background: #f0fdf4; border-color: #dcfce7; }
-        .status-error { background: #fef2f2; border-color: #fee2e2; }
-        .status-pending { background: #eff6ff; border-color: #dbeafe; }
+        .status-success {
+            background: #f0fdf4;
+            border-color: #dcfce7;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            border-color: #fee2e2;
+        }
+
+        .status-pending {
+            background: #eff6ff;
+            border-color: #dbeafe;
+        }
 
         .status-icon {
             width: 2.25rem;
@@ -606,12 +742,31 @@
             flex-shrink: 0;
         }
 
-        .icon-blue { background: var(--blue-onpc); }
-        .icon-green { background: #22c55e; }
-        .icon-red { background: #ef4444; }
+        .icon-blue {
+            background: var(--blue-onpc);
+        }
 
-        .status-title { font-size: 0.75rem; font-weight: 900; color: var(--slate-700); }
-        .status-sub { font-size: 0.5625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate-400); }
+        .icon-green {
+            background: #22c55e;
+        }
+
+        .icon-red {
+            background: #ef4444;
+        }
+
+        .status-title {
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: var(--slate-700);
+        }
+
+        .status-sub {
+            font-size: 0.5625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--slate-400);
+        }
 
         .form-footer {
             display: flex;
@@ -643,7 +798,7 @@
         .camera-modal {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -651,6 +806,7 @@
             justify-content: center;
             backdrop-filter: blur(10px);
         }
+
         .camera-container {
             width: 100%;
             max-width: 500px;
@@ -660,6 +816,7 @@
             align-items: center;
             gap: 2rem;
         }
+
         .camera-view {
             width: 100%;
             aspect-ratio: 3/4;
@@ -667,19 +824,22 @@
             border-radius: 2rem;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
+
         .camera-video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
         .camera-controls {
             display: flex;
             align-items: center;
             gap: 3rem;
         }
+
         .btn-capture {
             width: 5rem;
             height: 5rem;
@@ -690,15 +850,20 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        .btn-capture:hover { transform: scale(1.1); }
+
+        .btn-capture:hover {
+            transform: scale(1.1);
+        }
+
         .btn-capture-inner {
             width: 100%;
             height: 100%;
             background: #fff;
             border-radius: 50%;
         }
+
         .btn-close-camera {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
             width: 3.5rem;
             height: 3.5rem;
@@ -709,7 +874,10 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        .btn-close-camera:hover { background: rgba(255,255,255,0.2); }
+
+        .btn-close-camera:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
 
         /* --- Footer badges --- */
         .hero-footer-badges {
@@ -723,14 +891,21 @@
             display: flex;
             align-items: center;
             gap: 0.375rem;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             padding: 0.5rem 1rem;
             border-radius: var(--radius-full);
         }
 
         @media (max-width: 640px) {
-            .hero-footer-badges { flex-direction: column; gap: 0.5rem; align-items: stretch; }
-            .footer-badge { justify-content: center; }
+            .hero-footer-badges {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: stretch;
+            }
+
+            .footer-badge {
+                justify-content: center;
+            }
         }
 
         .badge-dot-small {
@@ -748,8 +923,13 @@
         }
 
         /* --- Sections --- */
-        .section { padding: 6rem 0; }
-        .section-white { background: var(--white); }
+        .section {
+            padding: 6rem 0;
+        }
+
+        .section-white {
+            background: var(--white);
+        }
 
         .section-header {
             text-align: center;
@@ -781,7 +961,9 @@
         }
 
         @media (min-width: 768px) {
-            .steps-grid { grid-template-columns: repeat(3, 1fr); }
+            .steps-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .step-card {
@@ -843,8 +1025,18 @@
             color: var(--white);
         }
 
-        .cta-title { font-size: 2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem; }
-        .cta-desc { color: rgba(255, 255, 255, 0.5); font-weight: 500; margin-bottom: 2rem; }
+        .cta-title {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .cta-desc {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
 
         .cta-btn {
             display: inline-flex;
@@ -863,7 +1055,9 @@
             transition: all 0.3s;
         }
 
-        .cta-btn:hover { transform: scale(1.05); }
+        .cta-btn:hover {
+            transform: scale(1.05);
+        }
 
         /* --- Main Footer --- */
         .footer {
@@ -880,11 +1074,23 @@
         }
 
         @media (min-width: 768px) {
-            .footer-inner { flex-direction: row; justify-content: space-between; }
+            .footer-inner {
+                flex-direction: row;
+                justify-content: space-between;
+            }
         }
 
-        .footer-logo { display: flex; align-items: center; gap: 0.75rem; }
-        .footer-logo-img { height: 2rem; opacity: 0.7; }
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .footer-logo-img {
+            height: 2rem;
+            opacity: 0.7;
+        }
+
         .footer-logo-text {
             font-size: 0.5625rem;
             font-weight: 900;
@@ -902,14 +1108,60 @@
         }
 
         /* --- Animations --- */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
+        }
 
         /* --- SVGs --- */
-        .icon { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
     </style>
 </head>
+
 <body x-data="geoHandler()">
 
     <!-- --- Navbar --- -->
@@ -926,7 +1178,10 @@
                 <a href="{{ route('admin.login') }}" class="nav-link hidden md-flex">Admin</a>
                 <a href="{{ route('caserne.auth.login') }}" class="nav-link hidden md-flex">Caserne</a>
                 <a href="{{ route('structure.auth.login') }}" class="nav-btn">
-                    <svg class="icon"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <svg class="icon">
+                        <path
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
                     <span>Espace Structure</span>
                 </a>
             </div>
@@ -937,7 +1192,7 @@
     <section class="hero">
         <div class="hero-blob-1"></div>
         <div class="hero-blob-2"></div>
-        
+
         <div class="container hero-grid">
             <!-- Left Text -->
             <div class="hero-text">
@@ -946,8 +1201,9 @@
                     <span class="badge-text">Système actif — 24h/24 7j/7</span>
                 </div>
                 <h1 class="hero-heading">Signalez<br><span class="text-orange">Votre</span><br>Urgence</h1>
-                <p class="hero-desc">La plateforme nationale de gestion des sinistres. Déclarez un incident en temps réel et les secours les plus proches seront coordonnés immédiatement.</p>
-                
+                <p class="hero-desc">La plateforme nationale de gestion des sinistres. Déclarez un incident en temps
+                    réel et les secours les plus proches seront coordonnés immédiatement.</p>
+
                 <div class="hero-stats">
                     <div class="stat-card">
                         <p class="stat-val">24/7</p>
@@ -965,10 +1221,14 @@
             </div>
 
             <!-- Right Form -->
-            <div x-data="{ 
-                step: 1, 
-                img1: null, img2: null, img3: null,
-                cameraOpen: false, cameraTarget: null, stream: null,
+            <div x-data="{
+                step: 1,
+                img1: null,
+                img2: null,
+                img3: null,
+                cameraOpen: false,
+                cameraTarget: null,
+                stream: null,
                 preview(e, target) { const file = e.target.files[0]; if (file) { this[target] = URL.createObjectURL(file); } },
                 async startCamera(target) {
                     this.cameraTarget = target;
@@ -982,7 +1242,10 @@
                     }
                 },
                 stopCamera() {
-                    if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
+                    if (this.stream) {
+                        this.stream.getTracks().forEach(t => t.stop());
+                        this.stream = null;
+                    }
                     this.cameraOpen = false;
                 },
                 capture() {
@@ -992,7 +1255,7 @@
                     canvas.getContext('2d').drawImage(this.$refs.video, 0, 0);
                     const dataUrl = canvas.toDataURL('image/jpeg');
                     this[this.cameraTarget] = dataUrl;
-                    
+            
                     canvas.toBlob(blob => {
                         const file = new File([blob], 'camera_' + Date.now() + '.jpg', { type: 'image/jpeg' });
                         const container = new DataTransfer();
@@ -1015,7 +1278,8 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('sinistre.store') }}" method="POST" enctype="multipart/form-data" class="form-body">
+                    <form action="{{ route('sinistre.store') }}" method="POST" enctype="multipart/form-data"
+                        class="form-body">
                         @csrf
                         <input type="hidden" name="latitude" x-model="latitude">
                         <input type="hidden" name="longitude" x-model="longitude">
@@ -1025,27 +1289,37 @@
                             <div class="form-grid form-grid-2">
                                 <div class="field-group">
                                     <label class="field-label">Nom & Prénoms *</label>
-                                    <input type="text" name="nom_complet" required placeholder="Jean Kouassi" class="input">
+                                    <input type="text" name="nom_complet" required placeholder="Jean Kouassi"
+                                        class="input">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">Contact *</label>
-                                    <input type="tel" name="contact" required placeholder="07 00 00 00" class="input">
+                                    <input type="tel" name="contact" required placeholder="0700000000"
+                                        class="input" inputmode="numeric" pattern="[0-9]{10}" maxlength="10"
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
                                 </div>
                             </div>
 
                             <div class="field-group" style="margin-top:1rem">
                                 <label class="field-label">Nature de l'incident *</label>
                                 <div class="type-grid">
-                                    @foreach([['Incendie','🔥'],['Accident','🚗'],['Inondation','🌊'],['Effondrement','🏚️'],['Médical','🚑'],['Autre','⚠️']] as [$val,$icon])
-                                    <label class="type-option">
-                                        <input type="radio" name="type_sinistre" value="{{ $val }}" class="type-radio" required>
-                                        <div class="type-box">
-                                            <span class="type-icon">{{ $icon }}</span>
-                                            <span class="type-label">{{ $val }}</span>
-                                        </div>
-                                    </label>
+                                    @foreach ([['Incendie', '🔥'], ['Accident', '🚗'], ['Inondation', '🌊'], ['Effondrement', '🏚️'], ['Médical', '🚑'], ['Autre', '⚠️']] as [$val, $icon])
+                                        <label class="type-option">
+                                            <input type="radio" name="type_sinistre" value="{{ $val }}"
+                                                class="type-radio" required>
+                                            <div class="type-box">
+                                                <span class="type-icon">{{ $icon }}</span>
+                                                <span class="type-label">{{ $val }}</span>
+                                            </div>
+                                        </label>
                                     @endforeach
                                 </div>
+                            </div>
+
+                            <div class="field-group" style="margin-top:1rem">
+                                <label class="field-label">Lieu exact / Point de repère *</label>
+                                <input type="text" name="lieu" required placeholder="Ex: Face à la pharmacie centrale, Rue 12"
+                                    class="input">
                             </div>
 
                             <div class="field-group" style="margin-top:1rem">
@@ -1060,33 +1334,59 @@
                         <div x-show="step === 2" x-cloak x-transition>
                             <label class="field-label">Photos de la scène (optionnel)</label>
                             <div class="photo-grid">
-                                @foreach(['img1','img2','img3'] as $m)
-                                <div class="photo-upload group cursor-pointer" @click="$refs.file{{ $m }}.click()">
-                                    {{-- Empty state --}}
-                                    <div x-show="!{{ $m }}" class="flex flex-col items-center gap-3">
-                                        <div class="flex gap-2">
-                                            <div @click="$refs.file{{ $m }}.click()" class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-slate-100 text-slate-400 group-hover:text-blue-600 transition-all cursor-pointer hover:scale-110">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                @foreach (['img1', 'img2', 'img3'] as $m)
+                                    <div class="photo-upload group cursor-pointer"
+                                        @click="$refs.file{{ $m }}.click()">
+                                        {{-- Empty state --}}
+                                        <div x-show="!{{ $m }}" class="flex flex-col items-center gap-3">
+                                            <div class="flex gap-2">
+                                                <div @click="$refs.file{{ $m }}.click()"
+                                                    class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-slate-100 text-slate-400 group-hover:text-blue-600 transition-all cursor-pointer hover:scale-110">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                    </svg>
+                                                </div>
+                                                <button type="button"
+                                                    @click.stop="startCamera('{{ $m }}')"
+                                                    class="w-12 h-12 rounded-2xl bg-orange-onpc shadow-lg shadow-orange-500/20 flex items-center justify-center text-white hover:scale-110 transition-all"
+                                                    style="background:var(--orange-onpc)">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </button>
                                             </div>
-                                            <button type="button" @click.stop="startCamera('{{ $m }}')" class="w-12 h-12 rounded-2xl bg-orange-onpc shadow-lg shadow-orange-500/20 flex items-center justify-center text-white hover:scale-110 transition-all" style="background:var(--orange-onpc)">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                            </button>
+                                            <span
+                                                class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Preuve
+                                                {{ substr($m, 3) }}</span>
                                         </div>
-                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Preuve {{ substr($m, 3) }}</span>
-                                    </div>
-                                    
-                                    {{-- Preview --}}
-                                    <div x-show="{{ $m }}" class="absolute inset-0 w-full h-full cursor-pointer" @click="$refs.file{{ $m }}.click()">
-                                        <img :src="{{ $m }}" class="w-full h-full object-cover">
-                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/30">
-                                                <span class="text-[10px] font-black text-white uppercase tracking-widest">Changer</span>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <input type="file" name="image{{ substr($m, 3) }}" x-ref="file{{ $m }}" class="hidden" accept="image/*" capture="environment" @change="preview($event,'{{ $m }}')">
-                                </div>
+                                        {{-- Preview --}}
+                                        <div x-show="{{ $m }}"
+                                            class="absolute inset-0 w-full h-full cursor-pointer"
+                                            @click="$refs.file{{ $m }}.click()">
+                                            <img :src="{{ $m }}" class="w-full h-full object-cover">
+                                            <div
+                                                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <div
+                                                    class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/30">
+                                                    <span
+                                                        class="text-[10px] font-black text-white uppercase tracking-widest">Changer</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <input type="file" name="image{{ substr($m, 3) }}"
+                                            x-ref="file{{ $m }}" class="hidden" accept="image/*"
+                                            capture="environment" @change="preview($event,'{{ $m }}')">
+                                    </div>
                                 @endforeach
                             </div>
 
@@ -1098,7 +1398,11 @@
                                     </div>
                                     <div class="camera-controls">
                                         <button type="button" @click="stopCamera" class="btn-close-camera">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
                                         </button>
                                         <button type="button" @click="capture" class="btn-capture">
                                             <div class="btn-capture-inner"></div>
@@ -1108,22 +1412,50 @@
                                 </div>
                             </div>
 
-                            <div class="geo-status-box" :class="geoStatus === 'success' ? 'status-success' : geoStatus === 'error' ? 'status-error' : 'status-pending'">
-                                <div class="status-icon" :class="geoStatus === 'success' ? 'icon-green' : geoStatus === 'error' ? 'icon-red' : 'icon-blue'">
-                                    <svg x-show="!geoStatus" style="width:1rem;height:1rem;animation:spin 1s linear infinite" fill="none" viewBox="0 0 24 24"><circle style="opacity:0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path style="opacity:0.75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-                                    <svg x-show="geoStatus === 'success'" style="width:1rem;height:1rem" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                    <svg x-show="geoStatus === 'error'" style="width:1rem;height:1rem" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <div class="geo-status-box"
+                                :class="geoStatus === 'success' ? 'status-success' : geoStatus === 'error' ?
+                                    'status-error' : 'status-pending'">
+                                <div class="status-icon"
+                                    :class="geoStatus === 'success' ? 'icon-green' : geoStatus === 'error' ? 'icon-red' :
+                                        'icon-blue'">
+                                    <svg x-show="!geoStatus"
+                                        style="width:1rem;height:1rem;animation:spin 1s linear infinite"
+                                        fill="none" viewBox="0 0 24 24">
+                                        <circle style="opacity:0.25" cx="12" cy="12" r="10"
+                                            stroke="currentColor" stroke-width="4"></circle>
+                                        <path style="opacity:0.75" fill="currentColor" d="M4 12a8 8 0 018-8v8z">
+                                        </path>
+                                    </svg>
+                                    <svg x-show="geoStatus === 'success'" style="width:1rem;height:1rem"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <svg x-show="geoStatus === 'error'" style="width:1rem;height:1rem" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
                                 </div>
                                 <div>
                                     <p class="status-title" x-text="geoMessage"></p>
                                     <p class="status-sub">Géolocalisation automatique</p>
                                 </div>
+                                <button type="button" @click="requestLocation()"
+                                    style="margin-left:auto;padding:0.5rem 0.75rem;border-radius:0.75rem;border:1px solid #cbd5e1;background:#fff;font-size:0.625rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#334155;">
+                                    Réessayer
+                                </button>
                             </div>
 
                             <div class="form-footer">
                                 <button type="button" @click="step = 1" class="btn-back">← Retour</button>
-                                <button type="submit" class="btn-submit btn-orange" :disabled="geoStatus === 'error'">
-                                    <svg style="width:1rem;height:1rem;display:inline-block;margin-right:0.5rem" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                <button type="submit" class="btn-submit btn-orange"
+                                    :disabled="geoStatus !== 'success'">
+                                    <svg style="width:1rem;height:1rem;display:inline-block;margin-right:0.5rem"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                    </svg>
                                     Envoyer l'alerte
                                 </button>
                             </div>
@@ -1132,9 +1464,18 @@
                 </div>
 
                 <div class="hero-footer-badges">
-                    <div class="footer-badge"><div class="badge-dot-small" style="background:#4ade80"></div><span class="badge-text-small">Sécurisé SSL</span></div>
-                    <div class="footer-badge"><div class="badge-dot-small" style="background:var(--orange-onpc)"></div><span class="badge-text-small">Temps réel</span></div>
-                    <div class="footer-badge"><div class="badge-dot-small" style="background:#60a5fa"></div><span class="badge-text-small">Urgence 24/7</span></div>
+                    <div class="footer-badge">
+                        <div class="badge-dot-small" style="background:#4ade80"></div><span
+                            class="badge-text-small">Sécurisé SSL</span>
+                    </div>
+                    <div class="footer-badge">
+                        <div class="badge-dot-small" style="background:var(--orange-onpc)"></div><span
+                            class="badge-text-small">Temps réel</span>
+                    </div>
+                    <div class="footer-badge">
+                        <div class="badge-dot-small" style="background:#60a5fa"></div><span
+                            class="badge-text-small">Urgence 24/7</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1148,17 +1489,15 @@
                 <h2 class="section-title">En 3 étapes simples</h2>
             </div>
             <div class="steps-grid">
-                @foreach([
-                    ['01','Déclarez','Remplissez le formulaire avec les informations de l\'incident et vos coordonnées.','🖊️','#eff6ff','#0000cc'],
-                    ['02','Localisez','Votre position GPS est automatiquement transmise aux équipes de secours.','📍','#fff7ed','#ff8300'],
-                    ['03','Secours','La caserne la plus proche est alertée et dépêchée sur les lieux immédiatement.','🚒','#fef2f2','#ef4444'],
-                ] as [$num,$title,$desc,$icon,$bg,$color])
-                <div class="step-card">
-                    <div class="step-icon-box" style="background:{{ $bg }}; color:{{ $color }}">{{ $icon }}</div>
-                    <div class="step-num-bg">{{ $num }}</div>
-                    <h3 class="step-title">{{ $title }}</h3>
-                    <p class="step-desc">{{ $desc }}</p>
-                </div>
+                @foreach ([['01', 'Déclarez', 'Remplissez le formulaire avec les informations de l\'incident et vos coordonnées.', '🖊️', '#eff6ff', '#0000cc'], ['02', 'Localisez', 'Votre position GPS est automatiquement transmise aux équipes de secours.', '📍', '#fff7ed', '#ff8300'], ['03', 'Secours', 'La caserne la plus proche est alertée et dépêchée sur les lieux immédiatement.', '🚒', '#fef2f2', '#ef4444']] as [$num, $title, $desc, $icon, $bg, $color])
+                    <div class="step-card">
+                        <div class="step-icon-box"
+                            style="background:{{ $bg }}; color:{{ $color }}">{{ $icon }}
+                        </div>
+                        <div class="step-num-bg">{{ $num }}</div>
+                        <h3 class="step-title">{{ $title }}</h3>
+                        <p class="step-desc">{{ $desc }}</p>
+                    </div>
                 @endforeach
             </div>
         </div>
@@ -1168,16 +1507,20 @@
     <section class="cta-section">
         <div class="container">
             <h2 class="cta-title">Une structure partenaire ?</h2>
-            <p class="cta-desc">Accédez à votre espace dédié pour déclarer des sinistres et coordonner vos interventions avec l'ONPC.</p>
+            <p class="cta-desc">Accédez à votre espace dédié pour déclarer des sinistres et coordonner vos
+                interventions avec l'ONPC.</p>
             <a href="{{ route('structure.auth.login') }}" class="cta-btn">
-                <svg style="width:1.25rem;height:1.25rem" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/></svg>
+                <svg style="width:1.25rem;height:1.25rem" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                </svg>
                 <span>Accéder à l'espace Structure</span>
             </a>
         </div>
     </section>
 
     <!-- --- Footer --- -->
-    <footer class="footer">
+    {{-- <footer class="footer">
         <div class="container footer-inner">
             <div class="footer-logo">
                 <img src="{{ asset('assets/images/logo_onpc.png') }}" alt="ONPC" class="footer-logo-img">
@@ -1185,47 +1528,65 @@
             </div>
             <p class="footer-copy">© {{ date('Y') }} ONPC — République de Côte d'Ivoire</p>
         </div>
-    </footer>
+    </footer> --}}
 
     <script>
         function geoHandler() {
             return {
-                latitude: null, longitude: null,
+                latitude: null,
+                longitude: null,
                 geoStatus: null,
                 geoMessage: 'Récupération de votre position...',
                 init() {
-                    if ("geolocation" in navigator) {
-                        navigator.geolocation.getCurrentPosition(
-                            (p) => {
-                                this.latitude = p.coords.latitude;
-                                this.longitude = p.coords.longitude;
-                                this.geoStatus = 'success';
-                                this.geoMessage = 'Position enregistrée avec succès';
-                            },
-                            () => {
-                                this.geoStatus = 'error';
-                                this.geoMessage = 'Accès à la position refusé';
-                            }
-                        );
-                    } else {
+                    this.requestLocation();
+                },
+                requestLocation() {
+                    this.geoStatus = null;
+                    this.geoMessage = 'Récupération de votre position...';
+
+                    if (!("geolocation" in navigator)) {
                         this.geoStatus = 'error';
                         this.geoMessage = 'Géolocalisation non supportée';
+                        return;
                     }
+
+                    navigator.geolocation.getCurrentPosition(
+                        (p) => {
+                            this.latitude = p.coords.latitude;
+                            this.longitude = p.coords.longitude;
+                            this.geoStatus = 'success';
+                            this.geoMessage = 'Position enregistrée avec succès';
+                        },
+                        () => {
+                            this.latitude = null;
+                            this.longitude = null;
+                            this.geoStatus = 'error';
+                            this.geoMessage = 'Position indisponible. Autorisez la localisation puis réessayez.';
+                        }, {
+                            enableHighAccuracy: true,
+                            timeout: 15000,
+                            maximumAge: 0,
+                        }
+                    );
                 }
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            @if(session('success'))
+            @if (session('success'))
                 Swal.fire({
                     icon: 'success',
                     title: 'Alerte Envoyée !',
                     text: "{{ session('success') }}",
                     confirmButtonColor: '#0000cc',
-                    customClass: { popup: 'rounded-3xl', confirmButton: 'radius-xl font-black uppercase tracking-widest text-xs' }
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'radius-xl font-black uppercase tracking-widest text-xs'
+                    }
                 });
             @endif
         });
     </script>
 </body>
+
 </html>

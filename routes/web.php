@@ -52,6 +52,8 @@ Route::prefix('admin')->group(function () {
             Route::get('/{structure}/modifier', [\App\Http\Controllers\Admin\StructureController::class, 'edit'])->name('edit');
             Route::put('/{structure}', [\App\Http\Controllers\Admin\StructureController::class, 'update'])->name('update');
             Route::post('/{structure}/resend', [\App\Http\Controllers\Admin\StructureController::class, 'resendOtp'])->name('resend');
+            Route::post('/{structure}/block', [\App\Http\Controllers\Admin\StructureController::class, 'block'])->name('block');
+            Route::post('/{structure}/unblock', [\App\Http\Controllers\Admin\StructureController::class, 'unblock'])->name('unblock');
             Route::delete('/{structure}', [\App\Http\Controllers\Admin\StructureController::class, 'destroy'])->name('destroy');
         });
     });
@@ -84,9 +86,27 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 
 // Routes protégées pour la Caserne
 Route::middleware(['auth', 'caserne'])->prefix('caserne')->name('caserne.')->group(function () {
+    Route::get('/groupe/dashboard', [\App\Http\Controllers\Caserne\GroupeController::class, 'dashboard'])->name('groupe.dashboard');
+    Route::get('/groupe/interventions', [\App\Http\Controllers\Caserne\GroupeController::class, 'interventions'])->name('groupe.interventions.index');
+    Route::get('/groupe/interventions-terminees', [\App\Http\Controllers\Caserne\GroupeController::class, 'interventionsTerminees'])->name('groupe.interventions.completed.index');
+    Route::get('/groupe/interventions-terminees/{sinistre}', [\App\Http\Controllers\Caserne\GroupeController::class, 'showInterventionTerminee'])->name('groupe.interventions.completed.show');
+    Route::get('/groupe/interventions-terminees/{sinistre}/pdf', [\App\Http\Controllers\Caserne\GroupeController::class, 'downloadInterventionTerminee'])->name('groupe.interventions.completed.pdf');
+    Route::get('/groupe/interventions/{sinistre}/etat-des-lieux', [\App\Http\Controllers\Caserne\GroupeController::class, 'etatDesLieuxCreate'])->name('groupe.interventions.etat-des-lieux.create');
+    Route::post('/groupe/interventions/{sinistre}/etat-des-lieux', [\App\Http\Controllers\Caserne\GroupeController::class, 'etatDesLieuxStore'])->name('groupe.interventions.etat-des-lieux.store');
+    Route::post('/groupe/sinistre/{sinistre}/demarrer', [\App\Http\Controllers\Caserne\GroupeController::class, 'claim'])->name('groupe.sinistre.claim');
+    Route::get('/groupe/sinistre/{sinistre}', [\App\Http\Controllers\Caserne\GroupeController::class, 'showSinistre'])->name('groupe.sinistre.show');
     Route::get('/dashboard', [\App\Http\Controllers\Caserne\CaserneController::class, 'dashboard'])->name('dashboard');
+    Route::get('/sinistres', [\App\Http\Controllers\Caserne\CaserneController::class, 'sinistres'])->name('sinistres.index');
     Route::get('/rapports', [\App\Http\Controllers\Caserne\CaserneController::class, 'rapports'])->name('rapports.index');
     Route::get('/historique', [\App\Http\Controllers\Caserne\CaserneController::class, 'historique'])->name('historique.index');
+    Route::get('/groupes', [\App\Http\Controllers\Caserne\GroupeController::class, 'index'])->name('groupes.index');
+    Route::get('/groupes/ajouter', [\App\Http\Controllers\Caserne\GroupeController::class, 'create'])->name('groupes.create');
+    Route::post('/groupes', [\App\Http\Controllers\Caserne\GroupeController::class, 'store'])->name('groupes.store');
+    Route::get('/groupes/{groupe}/personnes/ajouter', [\App\Http\Controllers\Caserne\GroupeController::class, 'createPersonne'])->name('groupes.personnes.create');
+    Route::get('/groupes/{groupe}/interventions', [\App\Http\Controllers\Caserne\GroupeController::class, 'interventionsListe'])->name('groupes.interventions.index');
+    Route::post('/groupes/{groupe}/personnes', [\App\Http\Controllers\Caserne\GroupeController::class, 'storePersonne'])->name('groupes.personnes.store');
+    Route::post('/groupes/{groupe}/personnes/{personne}/archiver', [\App\Http\Controllers\Caserne\GroupeController::class, 'archivePersonne'])->name('groupes.personnes.archive');
+    Route::delete('/groupes/{groupe}/personnes/{personne}', [\App\Http\Controllers\Caserne\GroupeController::class, 'destroyPersonne'])->name('groupes.personnes.destroy');
     Route::get('/sinistre/{sinistre}', [\App\Http\Controllers\Caserne\CaserneController::class, 'show'])->name('sinistre.show');
     Route::get('/sinistre/{sinistre}/rapport', [\App\Http\Controllers\Caserne\CaserneController::class, 'rapport'])->name('sinistre.rapport');
     Route::post('/sinistre/{sinistre}/recuperer', [\App\Http\Controllers\Caserne\CaserneController::class, 'claim'])->name('sinistre.claim');
@@ -100,4 +120,21 @@ Route::prefix('caserne')->name('caserne.auth.')->group(function () {
     Route::post('/', [\App\Http\Controllers\Caserne\AuthController::class, 'login'])->name('login-submit');
     Route::get('/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'showSetupForm'])->name('setup-form');
     Route::post('/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'setupPassword'])->name('setup-submit');
+    Route::get('/groupe/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'showGroupeSetupForm'])->name('groupe.setup-form');
+    Route::post('/groupe/setup-password', [\App\Http\Controllers\Caserne\AuthController::class, 'setupGroupePassword'])->name('groupe.setup-submit');
+});
+
+// Route temporaire pour mettre à jour les lieux des sinistres existants via conversion GPS
+Route::get('/dev/backfill-lieux', function() {
+    $sinistres = \App\Models\Sinistre::whereNull('lieu')->whereNotNull('latitude')->get();
+    $geocoder = new \App\Services\GeocodingService();
+    $count = 0;
+    foreach($sinistres as $s) {
+        $addr = $geocoder->reverseGeocode($s->latitude, $s->longitude);
+        if($addr) {
+            $s->update(['lieu' => $addr]);
+            $count++;
+        }
+    }
+    return "Mise à jour de $count sinistres effectuée avec succès.";
 });

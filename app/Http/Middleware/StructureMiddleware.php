@@ -17,6 +17,15 @@ class StructureMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::guard('structure')->check()) {
+            $structure = Auth::guard('structure')->user();
+            if ($structure && $structure->status === 'inactive') {
+                Auth::guard('structure')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('structure.auth.login')->with('error', 'Votre compte structure est bloqué.');
+            }
+
             return $next($request);
         }
 

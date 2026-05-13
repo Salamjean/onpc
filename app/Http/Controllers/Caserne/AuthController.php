@@ -19,6 +19,15 @@ class AuthController extends Controller
     }
 
     /**
+     * Affiche le formulaire de configuration du mot de passe pour un groupe
+     */
+    public function showGroupeSetupForm(Request $request)
+    {
+        $email = $request->email;
+        return view('caserne.auth.setup-password-groupe', compact('email'));
+    }
+
+    /**
      * Affiche le formulaire de connexion de la caserne
      */
     public function showLoginForm()
@@ -38,16 +47,20 @@ class AuthController extends Controller
 
         if (\Illuminate\Support\Facades\Auth::attempt($credentials)) {
             $user = \Illuminate\Support\Facades\Auth::user();
-            
+
             if ($user->role === 'caserne') {
                 $request->session()->regenerate();
-                // Redirection vers le tableau de bord de la caserne (à créer plus tard)
                 return redirect()->intended('/caserne/dashboard');
             }
 
-            // Si ce n'est pas une caserne, on déconnecte
+            if ($user->role === 'groupe') {
+                $request->session()->regenerate();
+                return redirect()->intended('/caserne/groupe/dashboard');
+            }
+
+            // Si ce n'est pas une caserne ou un groupe, on déconnecte
             \Illuminate\Support\Facades\Auth::logout();
-            return back()->withErrors(['email' => 'Accès réservé aux casernes.'])->onlyInput('email');
+            return back()->withErrors(['email' => 'Accès réservé aux casernes et groupes.'])->onlyInput('email');
         }
 
         return back()->withErrors(['email' => 'Identifiants invalides.'])->onlyInput('email');
@@ -65,9 +78,9 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)
-                    ->where('otp_code', $request->otp_code)
-                    ->where('role', 'caserne')
-                    ->first();
+            ->where('otp_code', $request->otp_code)
+            ->where('role', 'caserne')
+            ->first();
 
         if (!$user) {
             return back()->withErrors(['otp_code' => 'Le code OTP ou l\'email est invalide.'])->withInput();
@@ -80,5 +93,34 @@ class AuthController extends Controller
         ]);
 
         return redirect()->route('caserne.auth.login')->with('success', 'Votre mot de passe a été configuré avec succès. Vous pouvez maintenant vous connecter.');
+    }
+
+    /**
+     * Enregistre le mot de passe pour un groupe après vérification de l'OTP
+     */
+    public function setupGroupePassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp_code' => 'required|string|size:6',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)
+            ->where('otp_code', $request->otp_code)
+            ->where('role', 'groupe')
+            ->first();
+
+        if (!$user) {
+            return back()->withErrors(['otp_code' => 'Le code OTP ou l\'email est invalide.'])->withInput();
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+            'otp_code' => null,
+            'status' => 'active',
+        ]);
+
+        return redirect()->route('caserne.auth.login')->with('success', 'Mot de passe du groupe configuré avec succès. Vous pouvez maintenant vous connecter.');
     }
 }

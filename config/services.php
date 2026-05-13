@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'yellika' => [
+        'base_url' => env('YELLIKA_API_URL'),
+        'api_key' => env('YELLIKA_API_KEY'),
+        'sender_id' => env('YELLIKA_SENDER_ID'),
+    ],
+
 ];

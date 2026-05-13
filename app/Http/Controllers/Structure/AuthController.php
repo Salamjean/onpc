@@ -37,6 +37,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $structure = Structure::where('email', $credentials['email'])->first();
+        if ($structure && $structure->status === 'inactive') {
+            return back()->withErrors(['email' => 'Votre compte structure est bloqué. Veuillez contacter l\'administrateur.'])->onlyInput('email');
+        }
+
         if (Auth::guard('structure')->attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->route('structure.dashboard');
@@ -57,11 +62,15 @@ class AuthController extends Controller
         ]);
 
         $structure = Structure::where('email', $request->email)
-                            ->where('otp_code', $request->otp_code)
-                            ->first();
+            ->where('otp_code', $request->otp_code)
+            ->first();
 
         if (!$structure) {
             return back()->withErrors(['otp_code' => 'Le code OTP ou l\'email est invalide.'])->withInput();
+        }
+
+        if ($structure->status === 'inactive') {
+            return back()->withErrors(['email' => 'Ce compte structure est bloqué.'])->withInput();
         }
 
         // Mise à jour du mot de passe, passage en statut actif et suppression de l'OTP
@@ -101,14 +110,14 @@ class AuthController extends Controller
         $request->validate(['email' => 'required|email|exists:structures,email']);
 
         $structure = Structure::where('email', $request->email)->first();
-        
+
         // Génération d'un code OTP à 6 chiffres
         $otp = rand(100000, 999999);
         $structure->update(['otp_code' => $otp]);
 
         // Envoi de l'email
         \Illuminate\Support\Facades\Mail::to($structure->email)->send(new \App\Mail\OtpStructureMail($otp));
-        
+
         return redirect()->route('structure.auth.setup', ['email' => $request->email])
             ->with('success', 'Un code de vérification a été envoyé à votre adresse email.');
     }

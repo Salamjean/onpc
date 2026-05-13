@@ -3,7 +3,7 @@
 @section('content')
     <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div class="flex items-center gap-4">
-            <a href="{{ route('caserne.dashboard') }}"
+            <a href="{{ route('caserne.sinistres.index') }}"
                 class="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-caserne-red hover:shadow-lg transition-all">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
@@ -20,35 +20,48 @@
             </div>
         </div>
 
-        @if (
-            !$sinistre->assigned_caserne_id ||
-                ($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_attente'))
-            <form action="{{ route('caserne.sinistre.claim', $sinistre) }}" method="POST">
-                @csrf
-                <button type="submit"
-                    class="bg-caserne-red text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-red-900/20 hover:scale-[1.02] transition-all">
-                    Démarrer
-                </button>
-            </form>
-        @elseif($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_cours')
-            <a href="{{ route('caserne.sinistre.rapport', $sinistre) }}"
-                class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-green-900/20 transition-all">
-                État des lieux
-            </a>
-        @else
-            <div class="px-8 py-4 bg-green-50 border border-green-100 rounded-2xl">
-                <p class="text-[10px] font-black text-green-600 uppercase tracking-widest leading-none">Statut actuel</p>
-                <p class="text-sm font-bold text-green-700 mt-1 uppercase">
-                    @if ($sinistre->status == 'en_cours')
-                        En cours
-                    @elseif($sinistre->status == 'termine')
-                        Terminé
+        <div class="px-8 py-4 bg-slate-50 border border-slate-100 rounded-2xl">
+            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Statut actuel</p>
+            <p class="text-sm font-bold text-slate-700 mt-1 uppercase">
+                @if ($sinistre->status == 'en_cours')
+                    En cours
+                @elseif($sinistre->status == 'termine')
+                    Terminé
+                @else
+                    En attente
+                @endif
+            </p>
+        </div>
+    </div>
+
+    <div class="mb-8 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-7">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Groupe récupérateur</p>
+        <div class="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <p class="text-lg font-black text-slate-900">
+                    {{ $sinistre->caserneAssignee?->name ?? 'Aucun groupe n\'a encore récupéré cette déclaration' }}
+                </p>
+                <p class="text-sm font-medium text-slate-500 mt-1">
+                    @if ($sinistre->caserneAssignee)
+                        Groupe en charge de l'intervention en cours.
                     @else
-                        Pris en charge
+                        La déclaration est encore en attente de prise en charge.
                     @endif
                 </p>
             </div>
-        @endif
+
+            @if ($sinistre->caserneAssignee)
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 text-blue-700 w-fit">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Assigné</span>
+                </span>
+            @else
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 w-fit">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">En attente</span>
+                </span>
+            @endif
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -86,7 +99,7 @@
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Description citoyenne
                     </p>
                     <div
-                        class="p-8 bg-slate-50 rounded-[2rem] border border-slate-100 italic text-slate-600 font-medium leading-relaxed">
+                        class="p-8 bg-slate-50 rounded-4xl border border-slate-100 italic text-slate-600 font-medium leading-relaxed">
                         "{{ $sinistre->description }}"
                     </div>
                 </div>
@@ -154,7 +167,7 @@
                     <!-- Google Maps Navigation Button -->
                     <a href="https://www.google.com/maps/dir/?api=1&origin={{ $caserne->latitude }},{{ $caserne->longitude }}&destination={{ $sinistre->latitude }},{{ $sinistre->longitude }}&travelmode=driving"
                         target="_blank"
-                        class="flex items-center justify-center gap-3 w-full bg-caserne-red hover:bg-white hover:text-caserne-red text-white py-5 rounded-[1.5rem] font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-red-900/40">
+                        class="flex items-center justify-center gap-3 w-full bg-caserne-red hover:bg-white hover:text-caserne-red text-white py-5 rounded-3xl font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-red-900/40">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 20l-5.447-2.724A2 2 0 013 15.488V5.111a2 2 0 012.553-1.91l6.447 2.149 6.447-2.149A2 2 0 0121 5.111v10.377a2 2 0 01-1.553 1.91L14 20l-5 2z">

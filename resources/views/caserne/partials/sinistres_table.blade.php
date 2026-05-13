@@ -1,3 +1,4 @@
+{{-- Table de synthese pour les sinistres caserne --}}
 <div class="overflow-x-auto rounded-3xl border border-slate-100">
     <table class="w-full text-left border-separate border-spacing-y-2 min-w-[980px]">
         <thead>
@@ -7,7 +8,7 @@
                 <th class="px-6 py-4 text-center">Type Sinistre</th>
                 <th class="px-6 py-4 text-center">Localisation / Distance</th>
                 <th class="px-6 py-4 text-center">Statut</th>
-                <th class="px-6 py-4 text-center">Actions</th>
+                <th class="px-6 py-4 text-center">Détail</th>
             </tr>
         </thead>
         <tbody>
@@ -37,10 +38,7 @@
                     </td>
                     <td class="px-6 py-5 text-center">
                         <span
-                            class="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest 
-                        @if ($sinistre->type_sinistre == 'incendie') bg-red-100 text-red-600 
-                        @elseif($sinistre->type_sinistre == 'accident') bg-orange-100 text-orange-600 
-                        @else bg-blue-100 text-blue-600 @endif">
+                            class="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-700">
                             {{ $sinistre->type_sinistre }}
                         </span>
                     </td>
@@ -56,43 +54,22 @@
                     </td>
                     <td class="px-6 py-5 text-center">
                         <div
-                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                            @if ($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_attente') bg-blue-100 text-blue-600
-                            @elseif($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_cours') bg-emerald-100 text-emerald-700
-                            @else bg-orange-100 text-orange-600 @endif">
+                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700">
                             @if ($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_attente')
-                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
                                 <span class="text-[10px] font-black uppercase tracking-widest">Assigné</span>
                             @elseif($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_cours')
-                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
                                 <span class="text-[10px] font-black uppercase tracking-widest">En
                                     cours</span>
                             @elseif(!$sinistre->assigned_caserne_id)
-                                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
                                 <span class="text-[10px] font-black uppercase tracking-widest">Disponible</span>
                             @endif
                         </div>
                     </td>
                     <td class="px-6 py-5 last:rounded-r-4xl text-center">
                         <div class="flex items-center justify-center gap-3">
-                            {{-- Sinistre assigné ou libre → démarrer l'intervention --}}
-                            @if (
-                                ($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_attente') ||
-                                    !$sinistre->assigned_caserne_id)
-                                <form action="{{ route('caserne.sinistre.claim', $sinistre) }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="bg-caserne-red hover:bg-red-700 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm hover:shadow-md">
-                                        Démarrer
-                                    </button>
-                                </form>
-                            @elseif($sinistre->assigned_caserne_id == auth()->id() && $sinistre->status == 'en_cours')
-                                <a href="{{ route('caserne.sinistre.rapport', $sinistre) }}"
-                                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm hover:shadow-md">
-                                    État des lieux
-                                </a>
-                            @endif
-
                             <a href="{{ route('caserne.sinistre.show', $sinistre) }}"
                                 class="bg-caserne-dark hover:bg-slate-700 text-white p-2.5 rounded-xl transition-all shadow-sm hover:shadow-md">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

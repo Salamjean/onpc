@@ -16,8 +16,8 @@ class CaserneMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || Auth::user()->role !== 'caserne') {
-            // Si pas connecté ou pas le rôle caserne, on redirige vers le login caserne
+        if (!Auth::check() || !in_array(Auth::user()->role, ['caserne', 'groupe'])) {
+            // Si pas connecté ou pas le rôle attendu, on redirige vers le login caserne
             return redirect()->route('caserne.auth.login')->with('error', 'Accès non autorisé.');
         }
 

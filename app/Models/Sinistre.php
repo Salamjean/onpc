@@ -25,7 +25,13 @@ class Sinistre extends Model
         'nb_morts',
         'nb_blesses',
         'nb_evacues',
+        'etat_des_lieux_documents',
         'structure_id',
+    ];
+
+    protected $casts = [
+        'date_cloture' => 'datetime',
+        'etat_des_lieux_documents' => 'array',
     ];
 
     protected static function booted()
@@ -50,7 +56,7 @@ class Sinistre extends Model
     public function casernes()
     {
         return $this->belongsToMany(User::class, 'sinistre_caserne')
-                    ->withPivot('distance')
-                    ->withTimestamps();
+            ->withPivot('distance')
+            ->withTimestamps();
     }
 }

@@ -91,6 +91,31 @@ class StructureController extends Controller
         return back()->with('success', 'Le mail de configuration a été renvoyé avec succès.');
     }
 
+    public function block(Structure $structure)
+    {
+        if ($structure->status === 'inactive') {
+            return back()->with('error', 'Cette structure est déjà bloquée.');
+        }
+
+        $structure->update(['status' => 'inactive']);
+
+        return back()->with('success', 'La structure a été bloquée avec succès.');
+    }
+
+    public function unblock(Structure $structure)
+    {
+        if ($structure->status !== 'inactive') {
+            return back()->with('error', 'Cette structure n\'est pas bloquée.');
+        }
+
+        // Si l'OTP est encore présent, la structure revient en attente de configuration.
+        $nextStatus = $structure->otp_code ? 'pending' : 'active';
+
+        $structure->update(['status' => $nextStatus]);
+
+        return back()->with('success', 'La structure a été débloquée avec succès.');
+    }
+
     public function destroy(Structure $structure)
     {
         $structure->delete();

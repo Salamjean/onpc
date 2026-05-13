@@ -39,6 +39,15 @@ class SinistreController extends Controller
             $data['image3'] = $request->file('image3')->store('sinistres', 'public');
         }
 
+        // Géocodage inverse automatique si le lieu n'est pas fourni
+        if (empty($data['lieu']) && $data['latitude'] && $data['longitude']) {
+            $geocoder = new \App\Services\GeocodingService();
+            $address = $geocoder->reverseGeocode($data['latitude'], $data['longitude']);
+            if ($address) {
+                $data['lieu'] = $address;
+            }
+        }
+
         // Création du sinistre
         $sinistre = Sinistre::create($data);
 
