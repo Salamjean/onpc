@@ -93,6 +93,20 @@
                 </a>
             </li>
 
+            <li>
+                <a href="{{ route('caserne.assistance', Auth::user()->url_name) }}" target="_blank"
+                    class="flex items-center px-3 py-3 rounded-xl transition-all duration-200 group text-orange-200 hover:bg-white/10 hover:text-white border border-dashed border-white/20 mt-4 bg-white/5">
+                    <div class="bg-onpc-orange p-1.5 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-200 relative">
+                        <svg class="w-5 h-5 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full animate-ping"></span>
+                    </div>
+                    <span class="ml-3 font-bold truncate transition-all duration-300 uppercase text-[11px] tracking-widest"
+                        x-show="sidebarOpen">Assistance <span class="text-[8px] bg-red-500 px-1 rounded ml-1">LIVE</span></span>
+                </a>
+            </li>
+
             <li x-data="{ openGroupe: {{ request()->routeIs('caserne.groupes.*') ? 'true' : 'false' }} }">
                 <button type="button" @click="openGroupe = !openGroupe"
                     class="w-full flex items-center px-3 py-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('caserne.groupes.*') ? 'bg-white/20 text-white shadow-sm border border-white/10' : 'text-blue-100 hover:bg-white/5 hover:text-white' }}">

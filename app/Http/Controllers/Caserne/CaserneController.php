@@ -167,4 +167,26 @@ class CaserneController extends Controller
     {
         abort(403, 'La prise en charge des sinistres est desactivee pour la caserne.');
     }
+
+    public function assistance(\App\Models\User $user)
+    {
+        if($user->role !== 'caserne') abort(404);
+
+        $caserne = $user;
+        
+        $sinistres = Sinistre::with('caserneAssignee')->where(function ($query) use ($caserne) {
+                $query->whereHas('casernes', function ($q) use ($caserne) {
+                    $q->where('users.id', $caserne->id);
+                })
+                ->orWhere('assigned_caserne_id', $caserne->id)
+                ->orWhereHas('caserneAssignee', function ($q) use ($caserne) {
+                    $q->where('caserne_id', $caserne->id);
+                });
+            })
+            ->where('status', '!=', 'termine')
+            ->latest()
+            ->get();
+
+        return view('caserne.assistance', compact('sinistres', 'caserne'));
+    }
 }

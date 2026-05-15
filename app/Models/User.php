@@ -17,6 +17,27 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    /**
+     * Resolve hyphenated names from URL to spaces in DB
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if ($field === 'name') {
+            $realName = str_replace('-', ' ', $value);
+            return $this->where('name', $realName)->firstOrFail();
+        }
+
+        return parent::resolveRouteBinding($value, $field);
+    }
+
+    /**
+     * Get name formatted for URL (spaces to hyphens)
+     */
+    public function getUrlNameAttribute()
+    {
+        return str_replace(' ', '-', $this->name);
+    }
+
     public function sinistresAssignes()
     {
         return $this->belongsToMany(Sinistre::class, 'sinistre_caserne')

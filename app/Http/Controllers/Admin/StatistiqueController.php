@@ -20,13 +20,20 @@ class StatistiqueController extends Controller
             ])
             ->get()
             ->map(function ($caserne) {
-                $caserne->sinistres_non_termines = Sinistre::where('assigned_caserne_id', $caserne->id)
-                    ->where('status', '!=', 'termine')
+                $groupIds = User::where('caserne_id', $caserne->id)->pluck('id')->push($caserne->id);
+
+                $caserne->sinistres_non_termines = Sinistre::whereIn('assigned_caserne_id', $groupIds)
+                    ->where(function($q) {
+                        $q->whereNull('status')
+                          ->orWhere('status', '!=', 'termine');
+                    })
                     ->count();
 
-                $caserne->sinistres_termines = Sinistre::where('assigned_caserne_id', $caserne->id)
+                $caserne->sinistres_termines = Sinistre::whereIn('assigned_caserne_id', $groupIds)
                     ->where('status', 'termine')
                     ->count();
+                
+                $caserne->sinistres_total = $caserne->sinistres_non_termines + $caserne->sinistres_termines;
 
                 return $caserne;
             });
@@ -40,16 +47,18 @@ class StatistiqueController extends Controller
             abort(404);
         }
 
-        $totalSinistres = Sinistre::where('assigned_caserne_id', $user->id)->count();
-        $enAttente = Sinistre::where('assigned_caserne_id', $user->id)->where('status', 'en_attente')->count();
-        $enCours = Sinistre::where('assigned_caserne_id', $user->id)->where('status', 'en_cours')->count();
-        $termines = Sinistre::where('assigned_caserne_id', $user->id)->where('status', 'termine')->count();
+        $groupIds = User::where('caserne_id', $user->id)->pluck('id')->push($user->id);
 
-        $nbMorts = Sinistre::where('assigned_caserne_id', $user->id)->sum('nb_morts');
-        $nbBlesses = Sinistre::where('assigned_caserne_id', $user->id)->sum('nb_blesses');
-        $nbEvacues = Sinistre::where('assigned_caserne_id', $user->id)->sum('nb_evacues');
+        $totalSinistres = Sinistre::whereIn('assigned_caserne_id', $groupIds)->count();
+        $enAttente = Sinistre::whereIn('assigned_caserne_id', $groupIds)->where('status', 'en_attente')->count();
+        $enCours = Sinistre::whereIn('assigned_caserne_id', $groupIds)->where('status', 'en_cours')->count();
+        $termines = Sinistre::whereIn('assigned_caserne_id', $groupIds)->where('status', 'termine')->count();
 
-        $latestSinistres = Sinistre::where('assigned_caserne_id', $user->id)
+        $nbMorts = Sinistre::whereIn('assigned_caserne_id', $groupIds)->sum('nb_morts');
+        $nbBlesses = Sinistre::whereIn('assigned_caserne_id', $groupIds)->sum('nb_blesses');
+        $nbEvacues = Sinistre::whereIn('assigned_caserne_id', $groupIds)->sum('nb_evacues');
+
+        $latestSinistres = Sinistre::whereIn('assigned_caserne_id', $groupIds)
             ->latest()
             ->take(10)
             ->get();

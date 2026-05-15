@@ -19,7 +19,7 @@ class SinistreController extends Controller
             ->orderBy('name')
             ->get();
 
-        $query = Sinistre::with('caserneAssignee')
+        $query = Sinistre::with(['caserneAssignee.caserneParent', 'casernes'])
             ->where(function ($q) {
                 $q->whereNull('status')
                     ->orWhere('status', '!=', 'termine');
@@ -42,10 +42,19 @@ class SinistreController extends Controller
         }
 
         if ($request->filled('caserne_id')) {
-            $query->where('assigned_caserne_id', $request->caserne_id);
+            $caserneId = $request->caserne_id;
+            $query->where(function ($q) use ($caserneId) {
+                $q->where('assigned_caserne_id', $caserneId)
+                    ->orWhereHas('casernes', function ($sq) use ($caserneId) {
+                        $sq->where('users.id', $caserneId);
+                    })
+                    ->orWhereHas('caserneAssignee', function ($sq) use ($caserneId) {
+                        $sq->where('caserne_id', $caserneId);
+                    });
+            });
         }
 
-        $sinistres = $query->paginate(15);
+        $sinistres = $query->paginate(7);
 
         return view('admin.sinistre.index', compact('sinistres', 'casernes'));
     }
@@ -60,7 +69,7 @@ class SinistreController extends Controller
             ->orderBy('name')
             ->get();
 
-        $query = Sinistre::with('caserneAssignee')
+        $query = Sinistre::with(['caserneAssignee.caserneParent', 'casernes'])
             ->where('status', 'termine')
             ->latest();
 
@@ -73,7 +82,16 @@ class SinistreController extends Controller
         }
 
         if ($request->filled('caserne_id')) {
-            $query->where('assigned_caserne_id', $request->caserne_id);
+            $caserneId = $request->caserne_id;
+            $query->where(function ($q) use ($caserneId) {
+                $q->where('assigned_caserne_id', $caserneId)
+                    ->orWhereHas('casernes', function ($sq) use ($caserneId) {
+                        $sq->where('users.id', $caserneId);
+                    })
+                    ->orWhereHas('caserneAssignee', function ($sq) use ($caserneId) {
+                        $sq->where('caserne_id', $caserneId);
+                    });
+            });
         }
 
         $sinistres = $query->paginate(15);

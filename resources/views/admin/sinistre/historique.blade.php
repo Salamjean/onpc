@@ -121,10 +121,12 @@
                             <td class="py-5 px-6">
                                 @if ($sinistre->caserneAssignee)
                                     <div class="flex flex-col items-center">
-                                        <span
-                                            class="text-xs font-bold text-gray-700">{{ $sinistre->caserneAssignee->name }}</span>
-                                        <span
-                                            class="text-[10px] text-gray-400 uppercase mt-0.5">{{ $sinistre->caserneAssignee->commune }}</span>
+                                        <span class="text-xs font-black text-gray-800">{{ $sinistre->caserneAssignee->name }}</span>
+                                        @if($sinistre->caserneAssignee->role === 'groupe' && $sinistre->caserneAssignee->caserneParent)
+                                            <span class="text-[9px] text-onpc-blue font-bold uppercase mt-0.5 px-2 py-0.5 bg-blue-50 rounded-full border border-blue-100">
+                                                {{ $sinistre->caserneAssignee->caserneParent->name }}
+                                            </span>
+                                        @endif
                                     </div>
                                 @else
                                     <span class="text-[10px] font-bold text-gray-400 uppercase italic">Non assignée</span>
