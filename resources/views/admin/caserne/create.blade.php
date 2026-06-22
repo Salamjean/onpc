@@ -50,7 +50,7 @@
                                 <label for="name" class="block text-sm font-semibold text-gray-700 mb-1.5">Nom de la Caserne
                                     <span class="text-onpc-orange">*</span></label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
                                         <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -58,9 +58,15 @@
                                             </path>
                                         </svg>
                                     </div>
-                                    <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                                    <select id="name" name="name" required
                                         class="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-onpc-orange/20 focus:border-onpc-orange sm:text-sm text-gray-800 transition-all duration-200 shadow-sm @error('name') border-red-500 focus:ring-red-500/20 focus:border-red-500 @enderror"
-                                        placeholder="Ex: Centre de Cocody">
+                                        style="width: 100%">
+                                        @if(old('name'))
+                                            <option value="{{ old('name') }}" selected>{{ old('name') }}</option>
+                                        @else
+                                            <option value="" selected disabled>Rechercher une caserne...</option>
+                                        @endif
+                                    </select>
                                 </div>
                                 @error('name') <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
                                 @enderror
@@ -222,7 +228,7 @@
                                     </div>
                                     <input type="text" id="adresse" name="adresse" value="{{ old('adresse') }}" required
                                         class="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-onpc-blue/20 focus:border-onpc-blue sm:text-sm text-gray-800 transition-all duration-200 shadow-sm @error('adresse') border-red-500 focus:ring-red-500/20 focus:border-red-500 @enderror"
-                                        placeholder="Chercher une adresse...">
+                                        placeholder="Chercher ou saisir une adresse...">
                                 </div>
                                 @error('adresse') <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
                                 @enderror
@@ -274,11 +280,37 @@
         </div>
     </div>
 
+    <!-- Include jQuery & Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <style>
+    /* Style personnalisé pour intégrer Select2 avec le design Tailwind */
+    .select2-container--default .select2-selection--single {
+        height: 3.125rem; /* ~50px */
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        padding-left: 2.5rem;
+        padding-top: 0.45rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 3.125rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #1f2937;
+        line-height: 2.25rem;
+    }
+    .select2-search__field {
+        outline: none !important;
+    }
+    </style>
+
     <!-- Script Google Maps -->
     <script>
         let map;
         let marker;
-        let autocomplete;
 
         function initMap() {
             // Coordonnées par défaut (Abidjan)
@@ -286,7 +318,7 @@
             const lng = parseFloat(document.getElementById('longitude').value) || -4.01266;
             const defaultPos = { lat: lat, lng: lng };
 
-            // Style personnalisé pour la carte pour un look plus moderne
+            // Style personnalisé pour la carte
             const customMapStyle = [
                 { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "color": "#a7a7a7" }] },
                 { "featureType": "administrative", "elementType": "labels.text.fill", "stylers": [{ "color": "#737373" }] },
@@ -312,7 +344,7 @@
                 mapTypeControl: false,
                 streetViewControl: false,
                 styles: customMapStyle,
-                scrollwheel: false, // Prevents zooming when scrolling down the page
+                scrollwheel: false,
             });
 
             // Placer un marqueur déplaçable
@@ -324,26 +356,30 @@
                 animation: google.maps.Animation.DROP
             });
 
-            // Mettre à jour les champs cachés quand le marqueur est déplacé
+            // Service de géocodage pour mettre à jour l'adresse lors du drag du marqueur
+            const geocoder = new google.maps.Geocoder();
+
+            // Mettre à jour les champs quand le marqueur est déplacé
             google.maps.event.addListener(marker, 'dragend', function (evt) {
                 document.getElementById('latitude').value = evt.latLng.lat();
                 document.getElementById('longitude').value = evt.latLng.lng();
+                
+                geocoder.geocode({ location: evt.latLng }, function(results, status) {
+                    if (status === "OK" && results[0]) {
+                        document.getElementById('adresse').value = results[0].formatted_address;
+                    }
+                });
             });
 
-            // Autocomplétion pour le champ adresse
-            const input = document.getElementById("adresse");
-            autocomplete = new google.maps.places.Autocomplete(input);
-            autocomplete.bindTo("bounds", map);
+            // Autocomplétion manuelle pour le champ adresse (quand l'utilisateur ne passe pas par Select2)
+            const adresseInput = document.getElementById("adresse");
+            const adresseAutocomplete = new google.maps.places.Autocomplete(adresseInput);
+            adresseAutocomplete.bindTo("bounds", map);
 
-            autocomplete.addListener("place_changed", () => {
-                const place = autocomplete.getPlace();
+            adresseAutocomplete.addListener("place_changed", () => {
+                const place = adresseAutocomplete.getPlace();
+                if (!place.geometry || !place.geometry.location) return;
 
-                if (!place.geometry || !place.geometry.location) {
-                    window.alert("Aucun détail trouvé pour l'adresse saisie.");
-                    return;
-                }
-
-                // Déplacer la carte et le marqueur
                 if (place.geometry.viewport) {
                     map.fitBounds(place.geometry.viewport);
                 } else {
@@ -354,9 +390,112 @@
                 marker.setPosition(place.geometry.location);
                 marker.setAnimation(google.maps.Animation.DROP);
 
-                // Mettre à jour les coordonnées
                 document.getElementById('latitude').value = place.geometry.location.lat();
                 document.getElementById('longitude').value = place.geometry.location.lng();
+            });
+
+            // Initialize Services pour le Select2
+            const autocompleteService = new google.maps.places.AutocompleteService();
+            const placesService = new google.maps.places.PlacesService(map);
+
+            $(document).ready(function() {
+                $('#name').select2({
+                    placeholder: "Rechercher une caserne...",
+                    allowClear: true,
+                    tags: true, // Permet de saisir une caserne manuellement si elle n'est pas trouvée
+                    ajax: {
+                        delay: 500,
+                        transport: function (params, success, failure) {
+                            var query = params.data.q || "";
+                            
+                            // Amélioration du terme de recherche pour cibler les sapeurs-pompiers et CSU
+                            var request = {
+                                query: query ? query + " Sapeurs-Pompiers Côte d'Ivoire" : "Sapeurs-Pompiers Côte d'Ivoire",
+                            };
+                            
+                            placesService.textSearch(request, function (results, status) {
+                                var formattedResults = [];
+                                
+                                // Si aucune recherche n'est tapée, on force l'affichage des 8 compagnies principales (GSPM)
+                                // car Google Maps ne les répertorie pas toujours parfaitement.
+                                if (!query) {
+                                    var gspm = [
+                                        "1ère Compagnie d'Incendie et de Secours (Indénié - Adjamé)",
+                                        "2ème Compagnie d'Incendie et de Secours (Yopougon)",
+                                        "3ème Compagnie d'Incendie et de Secours (Port-Bouët / Vridi)",
+                                        "4ème Compagnie d'Incendie et de Secours (Bouaké)",
+                                        "5ème Compagnie d'Incendie et de Secours (Yamoussoukro)",
+                                        "6ème Compagnie d'Incendie et de Secours (Korhogo)",
+                                        "7ème Compagnie d'Incendie et de Secours (San-Pédro)",
+                                        "8ème Compagnie d'Incendie et de Secours (Bingerville)"
+                                    ];
+                                    gspm.forEach(function(nom) {
+                                        formattedResults.push({ id: nom, text: nom });
+                                    });
+                                }
+
+                                // Ajout des résultats trouvés par Google Maps
+                                if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                                    var googleResults = results.map(function (p) {
+                                        return {
+                                            id: p.name,
+                                            text: p.name + (p.formatted_address ? ' (' + p.formatted_address + ')' : ''),
+                                            place_id: p.place_id
+                                        };
+                                    });
+                                    formattedResults = formattedResults.concat(googleResults);
+                                }
+                                
+                                success({ results: formattedResults });
+                            });
+                        }
+                    }
+                });
+
+                // Lors de la sélection d'une caserne dans Select2
+                $('#name').on('select2:select', function (e) {
+                    var place_id = e.params.data.place_id;
+                    var text = e.params.data.text;
+                    
+                    if (place_id) {
+                        // Si la caserne vient de Google Maps avec un ID précis
+                        placesService.getDetails({ placeId: place_id }, function (place, status) {
+                            if (status === google.maps.places.PlacesServiceStatus.OK && place.geometry && place.geometry.location) {
+                                if (place.geometry.viewport) {
+                                    map.fitBounds(place.geometry.viewport);
+                                } else {
+                                    map.setCenter(place.geometry.location);
+                                    map.setZoom(16);
+                                }
+                                marker.setPosition(place.geometry.location);
+                                marker.setAnimation(google.maps.Animation.DROP);
+
+                                document.getElementById('latitude').value = place.geometry.location.lat();
+                                document.getElementById('longitude').value = place.geometry.location.lng();
+                                document.getElementById('adresse').value = place.formatted_address || place.name;
+                            }
+                        });
+                    } else if (text) {
+                        // Fallback : Si c'est une caserne ajoutée manuellement ou depuis notre liste en dur
+                        // On utilise le Geocoder classique pour tenter de la placer sur la carte
+                        geocoder.geocode({ address: text + ", Côte d'Ivoire" }, function(results, status) {
+                            if (status === "OK" && results[0]) {
+                                var loc = results[0].geometry.location;
+                                map.setCenter(loc);
+                                map.setZoom(15);
+                                marker.setPosition(loc);
+                                marker.setAnimation(google.maps.Animation.DROP);
+
+                                document.getElementById('latitude').value = loc.lat();
+                                document.getElementById('longitude').value = loc.lng();
+                                document.getElementById('adresse').value = results[0].formatted_address || text;
+                            } else {
+                                // Si Google ne trouve pas la ville/zone, on remplit juste l'adresse
+                                document.getElementById('adresse').value = text;
+                            }
+                        });
+                    }
+                });
             });
         }
     </script>

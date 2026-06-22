@@ -46,6 +46,20 @@ class CaserneController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // Vérification anti-doublon (même nom ET même localisation)
+        $exists = User::where('role', 'caserne')
+            ->where('name', $request->name)
+            ->where('latitude', $request->latitude)
+            ->where('longitude', $request->longitude)
+            ->exists();
+
+        if ($exists) {
+            return back()->withInput()->withErrors([
+                'name' => 'Une caserne avec ce nom et cette localisation exacte existe déjà.',
+                'adresse' => 'Cette adresse est déjà utilisée pour cette même caserne.'
+            ]);
+        }
+
         $logoPath = null;
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('casernes', 'public');
@@ -100,6 +114,20 @@ class CaserneController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'nullable|string',
         ]);
+
+        // Vérification anti-doublon lors de la mise à jour
+        $exists = User::where('role', 'caserne')
+            ->where('id', '!=', $user->id)
+            ->where('name', $request->name)
+            ->where('latitude', $request->latitude)
+            ->where('longitude', $request->longitude)
+            ->exists();
+
+        if ($exists) {
+            return back()->withInput()->withErrors([
+                'name' => 'Une autre caserne avec ce nom et cette localisation exacte existe déjà.'
+            ]);
+        }
 
         $data = $request->only(['name', 'email', 'telephone', 'commune', 'adresse', 'latitude', 'longitude', 'status']);
 

@@ -20,16 +20,99 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <button
-                    class="relative text-gray-400 hover:text-onpc-blue transition-colors p-2 rounded-full hover:bg-blue-50 focus:outline-none">
-                    <span
-                        class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-                        </path>
-                    </svg>
-                </button>
+                @php
+                    $user = Auth::user();
+                    if ($user->role === 'caserne') {
+                        $notifications = \App\Models\Sinistre::where('status', 'en_attente')
+                            ->whereHas('casernes', function ($query) use ($user) {
+                                $query->where('users.id', $user->id);
+                            })
+                            ->latest()
+                            ->get();
+                        $allAlertsRoute = route('caserne.sinistres.index');
+                        $showRouteName = 'caserne.sinistre.show';
+                    } else {
+                        // Pour les groupes, ils voient les alertes de leur caserne parente
+                        $caserneParentId = $user->caserne_id;
+                        $notifications = \App\Models\Sinistre::where('status', 'en_attente')
+                            ->whereHas('casernes', function ($query) use ($caserneParentId) {
+                                $query->where('users.id', $caserneParentId);
+                            })
+                            ->latest()
+                            ->get();
+                        $allAlertsRoute = route('caserne.groupe.dashboard');
+                        $showRouteName = 'caserne.groupe.sinistre.show';
+                    }
+                    $unreadCount = $notifications->count();
+                @endphp
+
+                <div class="relative inline-flex" x-data="{ notifOpen: false }">
+                    <button @click.prevent="notifOpen = !notifOpen"
+                        class="relative text-gray-400 hover:text-onpc-blue transition-colors p-2 rounded-full hover:bg-blue-50 focus:outline-none">
+                        @if($unreadCount > 0)
+                            <span class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white border-2 border-white">
+                                {{ $unreadCount }}
+                            </span>
+                        @endif
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <!-- Menu Notifications -->
+                    <div class="origin-top-right z-50 absolute top-full right-0 w-80 bg-white border border-gray-100 py-2 rounded-2xl shadow-xl overflow-hidden mt-2"
+                        x-show="notifOpen" x-transition:enter="transition ease-out duration-200 transform"
+                        x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0 scale-95" @click.outside="notifOpen = false"
+                        style="display: none;">
+                        <div class="px-4 py-3 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                            <p class="text-sm font-bold text-gray-900">Notifications</p>
+                            @if($unreadCount > 0)
+                                <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">{{ $unreadCount }} nouvelle(s)</span>
+                            @endif
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            @if($unreadCount > 0)
+                                @foreach($notifications as $notif)
+                                    <a href="{{ route($showRouteName, $notif->id) }}" class="block px-4 py-3 border-b border-gray-50 hover:bg-orange-50 transition-colors">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 bg-red-100 p-2 rounded-full">
+                                                <span class="text-lg">{{ $notif->type_sinistre == 'Incendie' ? '🔥' : ($notif->type_sinistre == 'Accident' ? '🚗' : ($notif->type_sinistre == 'Inondation' ? '🌊' : '⚠️')) }}</span>
+                                            </div>
+                                            <div class="ml-3 w-0 flex-1">
+                                                <p class="text-sm font-semibold text-gray-900 truncate">
+                                                    Nouvelle urgence: {{ $notif->type_sinistre }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 line-clamp-2 mt-0.5">
+                                                    {{ $notif->lieu ?? 'Position GPS reçue' }}
+                                                </p>
+                                                <p class="text-[10px] text-gray-400 mt-1 font-medium">
+                                                    {{ $notif->created_at->diffForHumans() }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            @else
+                                <div class="px-4 py-8 text-center">
+                                    <svg class="mx-auto h-8 w-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                    </svg>
+                                    <p class="text-sm text-gray-500 font-medium">Aucune nouvelle alerte</p>
+                                </div>
+                            @endif
+                        </div>
+                        @if($unreadCount > 0)
+                        <div class="border-t border-gray-100 p-2 text-center bg-gray-50/50">
+                            <a href="{{ $allAlertsRoute }}" class="text-[11px] font-bold text-onpc-blue hover:text-blue-800 uppercase tracking-wider block py-1">Voir toutes les alertes</a>
+                        </div>
+                        @endif
+                    </div>
+                </div>
 
                 <div class="w-px h-8 bg-gray-200 hidden sm:block"></div>
 

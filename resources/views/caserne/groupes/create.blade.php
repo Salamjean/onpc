@@ -31,6 +31,9 @@
                             groupe *</label>
                         <input type="text" name="name" value="{{ old('name') }}" required
                             class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-base font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-onpc-blue/10 focus:border-onpc-blue">
+                        @error('name')
+                            <p class="text-xs text-red-500 mt-1.5 font-semibold">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -39,6 +42,9 @@
                                 *</label>
                             <input type="email" name="email" value="{{ old('email') }}" required
                                 class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-base font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-onpc-blue/10 focus:border-onpc-blue">
+                            @error('email')
+                                <p class="text-xs text-red-500 mt-1.5 font-semibold">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
@@ -47,6 +53,9 @@
                                 *</label>
                             <input type="text" name="telephone" value="{{ old('telephone') }}" required
                                 class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-base font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-onpc-blue/10 focus:border-onpc-blue">
+                            @error('telephone')
+                                <p class="text-xs text-red-500 mt-1.5 font-semibold">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

@@ -144,3 +144,12 @@ Route::get('/dev/backfill-lieux', function() {
     }
     return "Mise à jour de $count sinistres effectuée avec succès.";
 });
+
+// Route de secours pour servir les fichiers de stockage directement (contourne les problèmes de liens symboliques Windows avec artisan serve)
+Route::get('/storage/sinistres/{filename}', function ($filename) {
+    $path = storage_path('app/public/sinistres/' . $filename);
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response()->file($path);
+});

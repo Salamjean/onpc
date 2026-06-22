@@ -14,10 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'caserne' => \App\Http\Middleware\CaserneMiddleware::class,
-            'structure' => \App\Http\Middleware\StructureMiddleware::class,
+            'admin'      => \App\Http\Middleware\AdminMiddleware::class,
+            'caserne'    => \App\Http\Middleware\CaserneMiddleware::class,
+            'structure'  => \App\Http\Middleware\StructureMiddleware::class,
+            'groupe.api' => \App\Http\Middleware\GroupeApiMiddleware::class,
         ]);
+
+        $middleware->prependToGroup('api', \App\Http\Middleware\QueryTokenToHeaderMiddleware::class);
 
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->is('admin/*') || $request->is('admin')) {

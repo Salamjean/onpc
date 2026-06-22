@@ -284,6 +284,9 @@
         .video-box { width: 100%; max-width: 450px; aspect-ratio: 3/4; border-radius: 3rem; overflow: hidden; background: #000; border: 4px solid var(--white); }
         .shutter { width: 80px; height: 80px; background: var(--white); border-radius: 50%; border: 8px solid var(--onpc-orange); cursor: pointer; }
     </style>
+    
+    <!-- Google Maps API pour le Reverse Geocoding automatique -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places" async defer></script>
 </head>
 
 <body x-data="formHandler()">
@@ -374,7 +377,12 @@
 
                         <div style="margin-bottom: 2.5rem;">
                             <label class="label">Localisation (Rue, Quartier, Repère)</label>
-                            <input type="text" name="lieu" required placeholder="Ex: Face à la pharmacie..." class="control">
+                            <div style="display: flex; gap: 0.75rem; align-items: stretch;">
+                                <input type="text" name="lieu" required placeholder="Recherche GPS en cours..." class="control" readonly style="flex: 1; background-color: var(--slate-100); color: var(--slate-500); cursor: not-allowed; opacity: 0.8;">
+                                <button type="button" @click="requestLocation()" title="Rafraîchir la position GPS" style="background: var(--slate-100); border: 2px solid var(--slate-200); color: var(--onpc-blue); border-radius: 1.5rem; padding: 0 1.5rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s;" onmouseover="this.style.backgroundColor='var(--onpc-blue)'; this.style.color='white'; this.style.borderColor='var(--onpc-blue)';" onmouseout="this.style.backgroundColor='var(--slate-100)'; this.style.color='var(--onpc-blue)'; this.style.borderColor='var(--slate-200)';">
+                                    <i data-lucide="refresh-cw" style="width: 20px;"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <button type="button" @click="next()" class="btn-orange">
@@ -526,6 +534,20 @@
                             this.longitude = p.coords.longitude; 
                             this.geoStatus = 'success'; 
                             this.geoMessage = 'Position Verrouillée'; 
+
+                            // Tentative de Reverse Geocoding pour remplir le champ Lieu automatiquement
+                            if (window.google && google.maps && google.maps.Geocoder) {
+                                const geocoder = new google.maps.Geocoder();
+                                geocoder.geocode({ location: { lat: this.latitude, lng: this.longitude } }, (results, status) => {
+                                    if (status === "OK" && results[0]) {
+                                        const lieuInput = document.querySelector('input[name="lieu"]');
+                                        // On ne remplace que si l'utilisateur n'a pas encore tapé quelque chose
+                                        if (lieuInput && !lieuInput.value) {
+                                            lieuInput.value = results[0].formatted_address;
+                                        }
+                                    }
+                                });
+                            }
                         },
                         () => { 
                             this.geoStatus = 'error'; 
