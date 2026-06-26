@@ -101,6 +101,7 @@ class SinistreController extends Controller
 
     public function show(Sinistre $sinistre)
     {
+        $sinistre->load(['caserneAssignee.caserneParent', 'casernes']);
         return view('admin.sinistre.show', compact('sinistre'));
     }
 }

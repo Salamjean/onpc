@@ -48,15 +48,19 @@ class SinistreController extends Controller
             }
         }
 
-        // Création du sinistre
-        $sinistre = Sinistre::create($data);
+        // Création du sinistre ou fusion s'il existe déjà
+        $sinistre = Sinistre::createOrMerge($data);
 
-        // Recherche de la caserne la plus proche si la position est disponible
-        if ($sinistre->latitude && $sinistre->longitude) {
+        // Recherche de la caserne la plus proche si la position est disponible et que le sinistre est nouvellement créé
+        if ($sinistre->wasRecentlyCreated && $sinistre->latitude && $sinistre->longitude) {
             $this->assignNearestCasernes($sinistre);
         }
 
-        return back()->with('success', 'Votre déclaration a été enregistrée avec succès. Les secours ont été informés.');
+        $message = $sinistre->wasRecentlyCreated
+            ? 'Votre déclaration a été enregistrée avec succès. Les secours ont été informés.'
+            : 'Votre déclaration a été ajoutée à un incident en cours dans votre zone. Les secours ont été informés.';
+
+        return back()->with('success', $message);
     }
 
     /**

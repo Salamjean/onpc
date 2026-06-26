@@ -121,21 +121,30 @@
         
         <!-- Caserne Assignée -->
         <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-8 text-white shadow-2xl">
-            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Caserne en charge</h3>
-            @if($sinistre->caserneAssignee)
+            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Secours en charge</h3>
+            @php
+                $targetCaserneOrGroup = $sinistre->caserneOrGroup;
+            @endphp
+            @if($targetCaserneOrGroup)
                 <div class="flex items-center gap-4 mb-6">
                     <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10">
                         <svg class="w-8 h-8 text-onpc-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     </div>
                     <div>
-                        <p class="text-lg font-bold">{{ $sinistre->caserneAssignee->name }}</p>
-                        <p class="text-xs text-gray-400 uppercase tracking-widest mt-0.5">{{ $sinistre->caserneAssignee->commune }}</p>
+                        <p class="text-lg font-bold">{{ $targetCaserneOrGroup->name }}</p>
+                        <p class="text-xs text-gray-400 uppercase tracking-widest mt-0.5">
+                            @if($targetCaserneOrGroup->role === 'groupe')
+                                Groupe d'intervention
+                            @else
+                                Caserne notifiée (En attente de groupe)
+                            @endif
+                        </p>
                     </div>
                 </div>
                 <div class="space-y-3 pt-6 border-t border-white/5">
                     <div class="flex items-center gap-3 text-sm font-medium">
                         <svg class="w-4 h-4 text-onpc-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                        {{ $sinistre->caserneAssignee->telephone }}
+                        {{ $targetCaserneOrGroup->telephone }}
                     </div>
                 </div>
             @else

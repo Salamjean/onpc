@@ -90,13 +90,18 @@
             <div id="map" class="w-full h-full"></div>
             
             {{-- Infos de distance flottantes --}}
-            @if($sinistre->caserneAssignee)
+            @php
+                $targetCaserneOrGroup = $sinistre->caserneOrGroup;
+            @endphp
+            @if($targetCaserneOrGroup)
             <div class="absolute bottom-6 left-6 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white flex items-center gap-4 z-10">
                 <div class="w-10 h-10 bg-onpc-blue rounded-xl flex items-center justify-center text-white">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9a1 1 0 01-1-1v-5a1 1 0 011-1h2a1 1 0 011 1v5zm3 2a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a1 1 0 011-1h3a1 1 0 011 1v1z"/></svg>
                 </div>
                 <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Caserne → Sinistre</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                        {{ $targetCaserneOrGroup->role === 'groupe' ? 'Groupe' : 'Caserne' }} → Sinistre
+                    </p>
                     <p class="text-sm font-black text-slate-800 uppercase" id="distance-info">Calcul de l'itinéraire...</p>
                 </div>
             </div>
@@ -131,15 +136,21 @@
 
                 <div class="space-y-4">
                     <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Caserne en charge</p>
-                        @if($sinistre->caserneAssignee)
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Secours en charge</p>
+                        @if($targetCaserneOrGroup)
                             <div class="flex items-center gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl">
                                 <div class="w-10 h-10 bg-onpc-blue text-white rounded-xl flex items-center justify-center font-black">
-                                    {{ substr($sinistre->caserneAssignee->name, 0, 1) }}
+                                    {{ substr($targetCaserneOrGroup->name, 0, 1) }}
                                 </div>
                                 <div>
-                                    <p class="text-xs font-black text-slate-800 uppercase leading-none mb-1">{{ $sinistre->caserneAssignee->name }}</p>
-                                    <p class="text-[9px] font-bold text-blue-500 uppercase tracking-widest">En intervention</p>
+                                    <p class="text-xs font-black text-slate-800 uppercase leading-none mb-1">{{ $targetCaserneOrGroup->name }}</p>
+                                    <p class="text-[9px] font-bold text-blue-500 uppercase tracking-widest">
+                                        @if($targetCaserneOrGroup->role === 'groupe')
+                                            En intervention (Groupe)
+                                        @else
+                                            Caserne notifiée (En attente de groupe)
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         @else
@@ -183,7 +194,7 @@
                 </div>
 
                 <p class="text-[10px] font-medium text-white/60 leading-relaxed mb-6 italic">
-                    En attendant l'arrivée des secours ({{ $sinistre->caserneAssignee->name ?? 'ONPC' }}), veuillez suivre ces consignes de sécurité :
+                    En attendant l'arrivée des secours ({{ $targetCaserneOrGroup->name ?? 'ONPC' }}), veuillez suivre ces consignes de sécurité :
                 </p>
 
                 <div class="space-y-4" x-data="{ checked: [] }">
@@ -276,25 +287,25 @@
             title: "Lieu du sinistre"
         });
 
-        @if($sinistre->caserneAssignee && $sinistre->caserneAssignee->latitude)
+        @if($targetCaserneOrGroup && $targetCaserneOrGroup->latitude)
             const caserneLoc = { 
-                lat: {{ $sinistre->caserneAssignee->latitude }}, 
-                lng: {{ $sinistre->caserneAssignee->longitude }} 
+                lat: {{ $targetCaserneOrGroup->latitude }}, 
+                lng: {{ $targetCaserneOrGroup->longitude }} 
             };
 
-            // Marqueur Caserne
+            // Marqueur Secours
             new google.maps.Marker({
                 position: caserneLoc,
                 map: map,
                 icon: {
                     path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
                     scale: 7,
-                    fillColor: "#0000cc",
+                    fillColor: "{{ $targetCaserneOrGroup->role === 'groupe' ? '#ff8300' : '#0000cc' }}",
                     fillOpacity: 1,
                     strokeWeight: 2,
                     strokeColor: "#ffffff",
                 },
-                title: "Caserne"
+                title: "{{ $targetCaserneOrGroup->role === 'groupe' ? 'Groupe d\'intervention' : 'Caserne' }}"
             });
 
             // Itinéraire

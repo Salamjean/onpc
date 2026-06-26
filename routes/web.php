@@ -128,7 +128,7 @@ Route::middleware(['auth', 'caserne'])->prefix('caserne')->name('caserne.')->gro
     // Route::post('/logout', [CaserneController::class, 'logout'])->name('caserne.logout');
 });
 
-Route::get('/caserne/{user:name}/assistance', [\App\Http\Controllers\Caserne\CaserneController::class, 'assistance'])->name('caserne.assistance');
+Route::get('/caserne/{user}/assistance', [\App\Http\Controllers\Caserne\CaserneController::class, 'assistance'])->name('caserne.assistance');
 
 // Route temporaire pour mettre à jour les lieux des sinistres existants via conversion GPS
 Route::get('/dev/backfill-lieux', function() {

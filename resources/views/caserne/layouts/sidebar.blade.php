@@ -94,7 +94,10 @@
             </li>
 
             <li>
-                <a href="{{ route('caserne.assistance', Auth::user()->url_name) }}" target="_blank"
+                @php
+                    $assistanceUser = Auth::user()->role === 'groupe' ? Auth::user()->caserneParent : Auth::user();
+                @endphp
+                <a href="{{ route('caserne.assistance', $assistanceUser ? $assistanceUser->id : Auth::user()->id) }}" target="_blank"
                     class="flex items-center px-3 py-3 rounded-xl transition-all duration-200 group text-orange-200 hover:bg-white/10 hover:text-white border border-dashed border-white/20 mt-4 bg-white/5">
                     <div class="bg-onpc-orange p-1.5 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-200 relative">
                         <svg class="w-5 h-5 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

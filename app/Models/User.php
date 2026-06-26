@@ -25,18 +25,40 @@ class User extends Authenticatable
     {
         if ($field === 'name') {
             $realName = str_replace('-', ' ', $value);
-            return $this->where('name', $realName)->firstOrFail();
+            $user = $this->where('name', $realName)->first();
+
+            if (!$user) {
+                $user = $this->where('name', $value)->first();
+            }
+
+            if (!$user) {
+                $cleanValue = str_replace([' ', '-'], '', strtolower($value));
+                $user = $this->whereRaw("LOWER(REPLACE(REPLACE(name, '-', ''), ' ', '')) = ?", [$cleanValue])->first();
+            }
+
+            if (!$user) {
+                // Recherche par comparaison de slug (très robuste pour les caractères spéciaux comme les slashs)
+                $user = $this->get()->first(function ($u) use ($value) {
+                    return \Illuminate\Support\Str::slug($u->name) === $value;
+                });
+            }
+
+            if (!$user) {
+                abort(404);
+            }
+
+            return $user;
         }
 
         return parent::resolveRouteBinding($value, $field);
     }
 
     /**
-     * Get name formatted for URL (spaces to hyphens)
+     * Get name formatted for URL (spaces to hyphens, slugged)
      */
     public function getUrlNameAttribute()
     {
-        return str_replace(' ', '-', $this->name);
+        return \Illuminate\Support\Str::slug($this->name);
     }
 
     public function sinistresAssignes()

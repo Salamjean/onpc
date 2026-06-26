@@ -14,7 +14,7 @@ class SinistreController extends Controller
     {
         $structure = Auth::guard('structure')->user();
         $sinistres = Sinistre::where('structure_id', $structure->id)
-            ->with('caserneAssignee')
+            ->with(['caserneAssignee', 'casernes'])
             ->latest()
             ->paginate(15);
 
@@ -119,42 +119,47 @@ class SinistreController extends Controller
             $data['image2'] = $request->file('image2')->store('sinistres', 'public');
         }
 
-        $sinistre = Sinistre::create($data);
+        $sinistre = Sinistre::createOrMerge($data);
 
-        // ── Trouver la caserne la plus proche ──────────────────────────
-        $lat = (float) $request->latitude;
-        $lng = (float) $request->longitude;
+        $caserneProche = null;
+        if ($sinistre->wasRecentlyCreated) {
+            // ── Trouver la caserne la plus proche ──────────────────────────
+            $lat = (float) $request->latitude;
+            $lng = (float) $request->longitude;
 
-        $caserneProche = User::where('role', 'caserne')
-            ->whereNotNull('latitude')
-            ->whereNotNull('longitude')
-            ->get()
-            ->map(function ($caserne) use ($lat, $lng) {
-                $caserne->distance = $this->haversine(
-                    $lat, $lng,
-                    (float) $caserne->latitude,
-                    (float) $caserne->longitude
-                );
-                return $caserne;
-            })
-            ->sortBy('distance')
-            ->first();
+            $caserneProche = User::where('role', 'caserne')
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->get()
+                ->map(function ($caserne) use ($lat, $lng) {
+                    $caserne->distance = $this->haversine(
+                        $lat, $lng,
+                        (float) $caserne->latitude,
+                        (float) $caserne->longitude
+                    );
+                    return $caserne;
+                })
+                ->sortBy('distance')
+                ->first();
 
-        if ($caserneProche) {
-            // Assigner la caserne la plus proche
-            $sinistre->update(['assigned_caserne_id' => $caserneProche->id]);
-
-            // Enregistrer dans la table pivot avec la distance
-            $sinistre->casernes()->attach($caserneProche->id, [
-                'distance' => round($caserneProche->distance, 2),
-            ]);
+            if ($caserneProche) {
+                // Enregistrer dans la table pivot avec la distance (on laisse assigned_caserne_id à null)
+                $sinistre->casernes()->attach($caserneProche->id, [
+                    'distance' => round($caserneProche->distance, 2),
+                ]);
+            }
+        } else {
+            // Si le sinistre existait déjà (fusionné), on récupère la caserne déjà notifiée pour le message de retour
+            $caserneProche = $sinistre->casernes->first();
         }
         // ──────────────────────────────────────────────────────────────
+
+        $messageSuffix = $sinistre->wasRecentlyCreated ? 'a été notifiée.' : 'a été notifiée (votre signalement a été ajouté à l\'incident en cours).';
 
         return redirect()
             ->route('structure.dashboard')
             ->with('success', 'Alerte envoyée ! La caserne la plus proche (' .
-                ($caserneProche ? $caserneProche->name : 'inconnue') . ') a été notifiée.');
+                ($caserneProche ? $caserneProche->name : 'inconnue') . ') ' . $messageSuffix);
     }
 
     /**

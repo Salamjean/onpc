@@ -86,10 +86,13 @@
                         </span>
                     </td>
                     <td class="hidden lg:table-cell px-6 py-5">
-                        @if($sinistre->caserneAssignee)
+                        @php
+                            $targetSecours = $sinistre->caserneOrGroup;
+                        @endphp
+                        @if($targetSecours)
                             <div class="flex items-center gap-2">
                                 <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                <span class="text-xs font-bold text-slate-700">{{ $sinistre->caserneAssignee->name }}</span>
+                                <span class="text-xs font-bold text-slate-700">{{ $targetSecours->name }}</span>
                             </div>
                         @else
                             <span class="text-[10px] font-bold text-slate-400 italic">Recherche de secours...</span>

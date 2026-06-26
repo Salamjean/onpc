@@ -187,6 +187,10 @@ class CaserneController extends Controller
             ->latest()
             ->get();
 
+        if (request()->ajax()) {
+            return view('caserne.partials.assistance_grid', compact('sinistres', 'caserne'));
+        }
+
         return view('caserne.assistance', compact('sinistres', 'caserne'));
     }
 }
