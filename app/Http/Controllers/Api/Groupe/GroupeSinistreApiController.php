@@ -231,13 +231,31 @@ class GroupeSinistreApiController extends Controller
             'nb_morts'             => 'nullable|integer|min:0',
             'nb_blesses'           => 'nullable|integer|min:0',
             'nb_evacues'           => 'nullable|integer|min:0',
+            'etat_des_lieux_documents' => 'nullable|array',
+            'etat_des_lieux_documents.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
         ]);
+
+        $existingDocuments = is_array($sinistre->etat_des_lieux_documents)
+            ? $sinistre->etat_des_lieux_documents
+            : [];
+
+        $uploadedDocuments = [];
+        if ($request->hasFile('etat_des_lieux_documents')) {
+            foreach ($request->file('etat_des_lieux_documents') as $file) {
+                if ($file) {
+                    $uploadedDocuments[] = $file->store('etat-des-lieux', 'public');
+                }
+            }
+        }
+
+        $documentPaths = array_values(array_filter(array_merge($existingDocuments, $uploadedDocuments)));
 
         $sinistre->update([
             'rapport_intervention' => $validated['rapport_intervention'],
             'nb_morts'             => $validated['nb_morts'] ?? 0,
             'nb_blesses'           => $validated['nb_blesses'] ?? 0,
             'nb_evacues'           => $validated['nb_evacues'] ?? 0,
+            'etat_des_lieux_documents' => $documentPaths,
             'status'               => 'termine',
             'date_cloture'         => now(),
         ]);
